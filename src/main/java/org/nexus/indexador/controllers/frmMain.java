@@ -78,7 +78,11 @@ public class frmMain {
 
     @FXML
     protected void initialize() {
+        loadGrhData();
+        setupGrhListListener();
+    }
 
+    private void loadGrhData() {
         grhData grhDataManager = new grhData(); // Crear una instancia de grhData
         configManager = org.nexus.indexador.utils.configManager.getInstance(); // Inicializar configManager
 
@@ -101,94 +105,106 @@ public class frmMain {
             }
             lstIndices.setItems(grhIndices);
 
-            // Agregar un listener al ListView para capturar los eventos de selección
-            lstIndices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                // Obtener el índice seleccionado
-                int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
-
-                if (selectedIndex >= 0) {
-                    // Obtener el objeto grhData correspondiente al índice seleccionado
-                    grhData selectedGrh = grhList.get(selectedIndex);
-
-                    // Obtenemos todos los datos
-                    int fileGrh = selectedGrh.getFileNum();
-                    int nFrames = selectedGrh.getNumFrames();
-                    int x = selectedGrh.getsX();
-                    int y = selectedGrh.getsY();
-                    int width = selectedGrh.getTileWidth();
-                    int height = selectedGrh.getTileHeight();
-
-                    /** Editor de Grh **/
-                    txtImagen.setText(String.valueOf(fileGrh));
-                    txtNumFrames.setText(String.valueOf(nFrames));
-                    txtPosX.setText(String.valueOf(x));
-                    txtPosY.setText(String.valueOf(y));
-                    txtAncho.setText(String.valueOf(width));
-                    txtAlto.setText(String.valueOf(height));
-                    txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
-
-                    /** VISOR **/
-
-                    // ¿Es animación o imagen estática?
-                    if (nFrames == 1) {
-
-                        // Construir la ruta completa de la imagen para imagePath
-                        String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
-
-                        // Cargar la imagen completa desde el recurso
-                        Image fullImage = new Image(imagePath);
-
-                        File imageFile = new File(imagePath);
-
-                        if (imageFile.exists()) {
-                            // El archivo existe, cargar la imagen
-                            Image image = new Image(imageFile.toURI().toString());
-                            imgGrafico.setImage(image);
-
-                        } else {
-                            // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-                            System.out.println("El archivo de imagen no existe: " + imagePath);
-                        }
-
-                        // Recortar la región adecuada de la imagen completa
-                        PixelReader pixelReader = fullImage.getPixelReader();
-                        WritableImage croppedImage = new WritableImage(pixelReader, x, y, width, height);
-
-                        // Establecer el tamaño preferido del ImageView para que coincida con el tamaño de la imagen
-                        imgIndice.setFitWidth(width); // Ancho de la imagen
-                        imgIndice.setFitHeight(height); // Alto de la imagen
-
-                        // Desactivar la preservación de la relación de aspecto
-                        imgIndice.setPreserveRatio(false);
-
-                        // Mostrar la región recortada en el ImageView
-                        imgIndice.setImage(croppedImage);
-
-                    } else { // Animacion
-
-                        // Configurar la animación
-                        if (animationTimeline != null) {
-                            animationTimeline.stop();
-                        }
-
-                        animationTimeline = new Timeline(
-                                new KeyFrame(Duration.ZERO, event -> {
-                                    // Actualizar la imagen en el ImageView con el frame actual
-                                    updateFrame(selectedGrh);
-                                    currentIndex = (currentIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
-                                }),
-                                new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
-                        );
-                        animationTimeline.setCycleCount(Animation.INDEFINITE); // Repetir la animación indefinidamente
-                        animationTimeline.play(); // Iniciar la animación
-                    }
-                }
-            });
-
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setupGrhListListener() {
+        // Agregar un listener al ListView para capturar los eventos de selección
+        lstIndices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+
+            // Detenemos la animación actual si existe
+            if (animationTimeline != null) {
+                animationTimeline.stop();
+            }
+
+            // Obtener el índice seleccionado
+            int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+            if (selectedIndex >= 0) {
+                // Obtener el objeto grhData correspondiente al índice seleccionado
+                grhData selectedGrh = grhList.get(selectedIndex);
+                updateEditor(selectedGrh);
+                updateViewer(selectedGrh);
+            }
+        });
+    }
+
+    private void updateEditor(grhData selectedGrh) {
+        // Obtenemos todos los datos
+        int fileGrh = selectedGrh.getFileNum();
+        int nFrames = selectedGrh.getNumFrames();
+        int x = selectedGrh.getsX();
+        int y = selectedGrh.getsY();
+        int width = selectedGrh.getTileWidth();
+        int height = selectedGrh.getTileHeight();
+
+        txtImagen.setText(String.valueOf(fileGrh));
+        txtNumFrames.setText(String.valueOf(nFrames));
+        txtPosX.setText(String.valueOf(x));
+        txtPosY.setText(String.valueOf(y));
+        txtAncho.setText(String.valueOf(width));
+        txtAlto.setText(String.valueOf(height));
+        txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
+    }
+
+    private void updateViewer(grhData selectedGrh) {
+        int nFrames = selectedGrh.getNumFrames();
+        if (nFrames == 1) {
+            displayStaticImage(selectedGrh);
+        } else {
+            displayAnimation(selectedGrh, nFrames);
+        }
+    }
+
+    private void displayStaticImage(grhData selectedGrh) {
+        // Construir la ruta completa de la imagen para imagePath
+        String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
+        File imageFile = new File(imagePath);
+
+        if (imageFile.exists()) {
+            // El archivo existe, cargar la imagen
+            Image staticImage = new Image(imageFile.toURI().toString());
+            imgGrafico.setImage(staticImage);
+
+            // Recortar la región adecuada de la imagen completa
+            PixelReader pixelReader = staticImage.getPixelReader();
+            WritableImage croppedImage = new WritableImage(pixelReader, selectedGrh.getsX(), selectedGrh.getsY(), selectedGrh.getTileWidth(), selectedGrh.getTileHeight());
+
+            // Establecer el tamaño preferido del ImageView para que coincida con el tamaño de la imagen
+            imgIndice.setFitWidth(selectedGrh.getTileWidth()); // Ancho de la imagen
+            imgIndice.setFitHeight(selectedGrh.getTileHeight()); // Alto de la imagen
+
+            // Desactivar la preservación de la relación de aspecto
+            imgIndice.setPreserveRatio(false);
+
+            // Mostrar la región recortada en el ImageView
+            imgIndice.setImage(croppedImage);
+
+        } else {
+            // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
+            System.out.println("El archivo de imagen no existe: " + imagePath);
+        }
+
+    }
+
+    private void displayAnimation(grhData selectedGrh, int nFrames) {
+        // Configurar la animación
+        if (animationTimeline != null) {
+            animationTimeline.stop();
+        }
+
+        animationTimeline = new Timeline(
+                new KeyFrame(Duration.ZERO, event -> {
+                    // Actualizar la imagen en el ImageView con el frame actual
+                    updateFrame(selectedGrh);
+                    currentIndex = (currentIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
+                }),
+                new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
+        );
+        animationTimeline.setCycleCount(Animation.INDEFINITE); // Repetir la animación indefinidamente
+        animationTimeline.play(); // Iniciar la animación
     }
 
     private void updateFrame(grhData selectedGrh) {
