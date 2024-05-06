@@ -4,11 +4,17 @@ import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.stage.Stage;
+import org.nexus.indexador.Main;
 import org.nexus.indexador.models.grhData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -54,11 +60,16 @@ public class frmMain {
     @FXML
     private ImageView imgGrafico;
 
+    @FXML
+    private MenuItem mnuConsola;
+
     private ObservableList<grhData> grhList;
 
     private List<Image> animationFrames;
     private AnimationTimer animationTimer;
     private int currentFrameIndex = 0;
+
+    private static boolean consoleOpen = false; // Variable para rastrear si la ventana de la consola está abierta
 
     @FXML
     protected void initialize() {
@@ -143,6 +154,35 @@ public class frmMain {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
+    @FXML
+    private void openConsoleWindow() {
+        if (!consoleOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Consola");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmConsola.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                consoleOpen = true; // Actualiza el estado para indicar que la ventana de la consola está abierta
+
+                // Listener para detectar cuándo se cierra la ventana de la consola
+                consoleStage.setOnCloseRequest(event -> {
+                    consoleOpen = false; // Actualiza el estado cuando se cierra la ventana de la consola
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
         }
     }
 

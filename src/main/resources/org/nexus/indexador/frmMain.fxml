@@ -2,15 +2,18 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="paneMain" prefHeight="617.0" prefWidth="1066.0" minWidth="1066.0" maxWidth="1066.0" minHeight="617.0" maxHeight="617.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
+<AnchorPane fx:id="paneMain" maxHeight="617.0" maxWidth="1066.0" minHeight="617.0" minWidth="1066.0" prefHeight="617.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
    <children>
-      <Label fx:id="lblIndices" layoutX="14.0" layoutY="14.0" prefWidth="200.0" text="Indices cargados: 0" />
-      <ListView fx:id="lstIndices" layoutX="14.0" layoutY="53.0" prefHeight="548.0" prefWidth="200.0" />
-      <Label fx:id="lblVersion" layoutX="14.0" layoutY="31.0" prefWidth="200.0" text="Versión: 0" />
+      <Label fx:id="lblIndices" layoutX="14.0" layoutY="36.0" prefWidth="200.0" text="Indices cargados: 0" />
+      <ListView fx:id="lstIndices" layoutX="14.0" layoutY="75.0" prefHeight="526.0" prefWidth="200.0" />
+      <Label fx:id="lblVersion" layoutX="14.0" layoutY="53.0" prefWidth="200.0" text="Versión: 0" />
       <ImageView fx:id="imgIndice" fitHeight="548.0" fitWidth="446.0" layoutX="220.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true" />
       <Label fx:id="lblImagen" layoutX="684.0" layoutY="57.0" prefWidth="52.0" text="Imagen:" />
       <TextField fx:id="txtImagen" layoutX="742.0" layoutY="53.0" prefHeight="25.0" prefWidth="309.0" />
@@ -25,5 +28,29 @@
       <Label fx:id="lblNumFrames" layoutX="684.0" layoutY="89.0" prefWidth="64.0" text="N.Frames:" />
       <TextField fx:id="txtNumFrames" layoutX="742.0" layoutY="85.0" prefHeight="25.0" prefWidth="309.0" />
       <ImageView fx:id="imgGrafico" fitHeight="354.0" fitWidth="368.0" layoutX="684.0" layoutY="249.0" pickOnBounds="true" preserveRatio="true" />
+      <MenuBar fx:id="MnuBar" layoutY="2.0" prefHeight="25.0" prefWidth="1066.0">
+        <menus>
+          <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
+            <items>
+              <MenuItem fx:id="mnuClose" mnemonicParsing="false" text="Cerrar" />
+            </items>
+          </Menu>
+          <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+            <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
+               <items>
+                  <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#openConsoleWindow" text="Consola" />
+               </items>
+            </Menu>
+          <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
+            <items>
+              <MenuItem fx:id="mnuCode" mnemonicParsing="false" text="Codigo Fuente" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
    </children>
 </AnchorPane>
