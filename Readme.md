@@ -1,6 +1,6 @@
 # Indexador Nexus
 
-Indexador para Argentum Online programado en Java
+Indexador para Argentum Online programado en Java. Actualmente trabaja con recursos de tipo 0.13 o AOLibre.
 
 ## Screenshot
 
