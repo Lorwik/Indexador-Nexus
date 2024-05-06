@@ -1,8 +1,11 @@
 package org.nexus.indexador.controllers;
 
-import javafx.animation.AnimationTimer;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,8 +25,6 @@ import org.nexus.indexador.utils.configManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class frmMain {
 
@@ -68,20 +69,18 @@ public class frmMain {
 
     private ObservableList<grhData> grhList;
 
-    private List<Image> animationFrames;
-    private AnimationTimer animationTimer;
-    private int currentFrameIndex = 0;
+    private configManager configManager;
 
     private static boolean consoleOpen = false; // Variable para rastrear si la ventana de la consola está abierta
+
+    private int currentIndex = 1;
+    private Timeline animationTimeline;
 
     @FXML
     protected void initialize() {
 
         grhData grhDataManager = new grhData(); // Crear una instancia de grhData
-        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-
-        // Inicializa la lista de cuadros de animación
-        animationFrames = new ArrayList<>();
+        configManager = org.nexus.indexador.utils.configManager.getInstance(); // Inicializar configManager
 
         try {
             // Llamar al método para leer el archivo binario y obtener la lista de grhData
@@ -130,38 +129,80 @@ public class frmMain {
 
                     /** VISOR **/
 
-                    // Construir la ruta completa de la imagen para imagePath
-                    String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
+                    // ¿Es animación o imagen estática?
+                    if (nFrames == 1) {
 
-                    // Cargar la imagen completa desde el recurso
-                    Image fullImage = new Image(imagePath);
+                        // Construir la ruta completa de la imagen para imagePath
+                        String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
 
-                    File imageFile = new File(imagePath);
+                        // Cargar la imagen completa desde el recurso
+                        Image fullImage = new Image(imagePath);
 
-                    if (imageFile.exists()) {
-                        // El archivo existe, cargar la imagen
-                        Image image = new Image(imageFile.toURI().toString());
-                        imgGrafico.setImage(image);
+                        File imageFile = new File(imagePath);
 
-                    } else {
-                        // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-                        System.out.println("El archivo de imagen no existe: " + imagePath);
+                        if (imageFile.exists()) {
+                            // El archivo existe, cargar la imagen
+                            Image image = new Image(imageFile.toURI().toString());
+                            imgGrafico.setImage(image);
 
+                        } else {
+                            // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
+                            System.out.println("El archivo de imagen no existe: " + imagePath);
+                        }
+
+                        // Recortar la región adecuada de la imagen completa
+                        PixelReader pixelReader = fullImage.getPixelReader();
+                        WritableImage croppedImage = new WritableImage(pixelReader, x, y, width, height);
+
+                        // Establecer el tamaño preferido del ImageView para que coincida con el tamaño de la imagen
+                        imgIndice.setFitWidth(width); // Ancho de la imagen
+                        imgIndice.setFitHeight(height); // Alto de la imagen
+
+                        // Desactivar la preservación de la relación de aspecto
+                        imgIndice.setPreserveRatio(false);
+
+                        // Mostrar la región recortada en el ImageView
+                        imgIndice.setImage(croppedImage);
+
+                    } else { // Animacion
+
+                        // Configurar la animación
+                        if (animationTimeline != null) {
+                            animationTimeline.stop();
+                        }
+
+                        animationTimeline = new Timeline(
+                                new KeyFrame(Duration.ZERO, event -> {
+                                    // Actualizar la imagen en el ImageView con el frame actual
+                                    updateFrame(selectedGrh);
+                                    currentIndex = (currentIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
+                                }),
+                                new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
+                        );
+                        animationTimeline.setCycleCount(Animation.INDEFINITE); // Repetir la animación indefinidamente
+                        animationTimeline.play(); // Iniciar la animación
                     }
-
-                    // Recortar la región adecuada de la imagen completa
-                    PixelReader pixelReader = fullImage.getPixelReader();
-
-                    WritableImage croppedImage = new WritableImage(pixelReader, x, y, width, height);
-
-                    // Mostrar la región recortada en el ImageView
-                    imgIndice.setImage(croppedImage);
-
                 }
             });
 
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updateFrame(grhData selectedGrh) {
+        int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
+
+        if (currentIndex > 0) {
+
+            grhData currentGrh = grhList.get(frames[currentIndex]);
+            String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
+
+            Image frameImage = new Image(imagePath);
+            PixelReader pixelReader = frameImage.getPixelReader();
+            WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
+            imgIndice.setImage(croppedImage);
         }
     }
 
@@ -193,5 +234,4 @@ public class frmMain {
             }
         }
     }
-
 }

@@ -8,51 +8,61 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
 <AnchorPane fx:id="paneMain" maxHeight="617.0" maxWidth="1066.0" minHeight="617.0" minWidth="1066.0" prefHeight="617.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
-   <children>
-      <Label fx:id="lblIndices" layoutX="14.0" layoutY="36.0" prefWidth="200.0" text="Indices cargados: 0" />
-      <ListView fx:id="lstIndices" layoutX="14.0" layoutY="75.0" prefHeight="526.0" prefWidth="200.0" />
-      <Label fx:id="lblVersion" layoutX="14.0" layoutY="53.0" prefWidth="200.0" text="Versión: 0" />
-      <ImageView fx:id="imgIndice" fitHeight="548.0" fitWidth="446.0" layoutX="220.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true" />
-      <Label fx:id="lblImagen" layoutX="684.0" layoutY="57.0" prefWidth="52.0" text="Imagen:" />
-      <TextField fx:id="txtImagen" layoutX="742.0" layoutY="53.0" prefHeight="25.0" prefWidth="309.0" />
-      <Label fx:id="lblPosX" layoutX="684.0" layoutY="120.0" prefWidth="52.0" text="Pos X:" />
-      <TextField fx:id="txtPosX" layoutX="742.0" layoutY="116.0" prefHeight="25.0" prefWidth="309.0" />
-      <Label fx:id="lblPosY" layoutX="684.0" layoutY="151.0" prefWidth="52.0" text="Pos Y:" />
-      <TextField fx:id="txtPosY" layoutX="742.0" layoutY="147.0" prefHeight="25.0" prefWidth="309.0" />
-      <Label fx:id="lblAncho" layoutX="684.0" layoutY="182.0" prefWidth="52.0" text="Ancho:" />
-      <TextField fx:id="txtAncho" layoutX="742.0" layoutY="178.0" prefHeight="25.0" prefWidth="309.0" />
-      <Label fx:id="lblAlto" layoutX="684.0" layoutY="213.0" prefWidth="52.0" text="Alto:" />
-      <TextField fx:id="txtAlto" layoutX="742.0" layoutY="209.0" prefHeight="25.0" prefWidth="309.0" />
-      <Label fx:id="lblNumFrames" layoutX="684.0" layoutY="89.0" prefWidth="64.0" text="N.Frames:" />
-      <TextField fx:id="txtNumFrames" layoutX="742.0" layoutY="85.0" prefHeight="25.0" prefWidth="309.0" />
-      <ImageView fx:id="imgGrafico" fitHeight="322.0" fitWidth="368.0" layoutX="684.0" layoutY="281.0" pickOnBounds="true" preserveRatio="true" />
-      <MenuBar fx:id="MnuBar" layoutY="2.0" prefHeight="25.0" prefWidth="1066.0">
-        <menus>
-          <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
-            <items>
-              <MenuItem fx:id="mnuClose" mnemonicParsing="false" text="Cerrar" />
-            </items>
-          </Menu>
-          <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-            <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
-               <items>
-                  <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#openConsoleWindow" text="Consola" />
-               </items>
-            </Menu>
-          <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
-            <items>
-              <MenuItem fx:id="mnuCode" mnemonicParsing="false" text="Codigo Fuente" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-      <Label fx:id="lblIndice" layoutX="685.0" layoutY="245.0" prefWidth="52.0" text="Indice:" />
-      <TextField fx:id="txtIndice" editable="false" layoutX="743.0" layoutY="241.0" prefHeight="25.0" prefWidth="309.0" />
-   </children>
+    <children>
+        <Label fx:id="lblIndices" layoutX="14.0" layoutY="36.0" prefWidth="200.0" text="Indices cargados: 0" />
+        <ListView fx:id="lstIndices" layoutX="14.0" layoutY="75.0" prefHeight="526.0" prefWidth="200.0" />
+        <Label fx:id="lblVersion" layoutX="14.0" layoutY="53.0" prefWidth="200.0" text="Versión: 0" />
+
+        <Label fx:id="lblImagen" layoutX="684.0" layoutY="57.0" prefWidth="52.0" text="Imagen:" />
+        <TextField fx:id="txtImagen" layoutX="742.0" layoutY="53.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblPosX" layoutX="684.0" layoutY="120.0" prefWidth="52.0" text="Pos X:" />
+        <TextField fx:id="txtPosX" layoutX="742.0" layoutY="116.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblPosY" layoutX="684.0" layoutY="151.0" prefWidth="52.0" text="Pos Y:" />
+        <TextField fx:id="txtPosY" layoutX="742.0" layoutY="147.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblAncho" layoutX="684.0" layoutY="182.0" prefWidth="52.0" text="Ancho:" />
+        <TextField fx:id="txtAncho" layoutX="742.0" layoutY="178.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblAlto" layoutX="684.0" layoutY="213.0" prefWidth="52.0" text="Alto:" />
+        <TextField fx:id="txtAlto" layoutX="742.0" layoutY="209.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblNumFrames" layoutX="684.0" layoutY="89.0" prefWidth="64.0" text="N.Frames:" />
+        <TextField fx:id="txtNumFrames" layoutX="742.0" layoutY="85.0" prefHeight="25.0" prefWidth="309.0" />
+        <MenuBar fx:id="MnuBar" layoutY="2.0" prefHeight="25.0" prefWidth="1066.0">
+            <menus>
+                <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
+                    <items>
+                        <MenuItem fx:id="mnuClose" mnemonicParsing="false" text="Cerrar" />
+                    </items>
+                </Menu>
+                <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                    </items>
+                </Menu>
+                <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
+                    <items>
+                        <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#openConsoleWindow" text="Consola" />
+                    </items>
+                </Menu>
+                <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
+                    <items>
+                        <MenuItem fx:id="mnuCode" mnemonicParsing="false" text="Codigo Fuente" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <Label fx:id="lblIndice" layoutX="685.0" layoutY="245.0" prefWidth="52.0" text="Indice:" />
+        <TextField fx:id="txtIndice" editable="false" layoutX="743.0" layoutY="241.0" prefHeight="25.0" prefWidth="309.0" />
+      <Pane fx:id="PaneGrhView" layoutX="225.0" layoutY="78.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #CCCCCC;">
+         <children>
+      
+              <ImageView fx:id="imgIndice" fitHeight="526.0" fitWidth="446.0" pickOnBounds="true" preserveRatio="true" />
+         </children></Pane>
+      <Pane layoutX="685.0" layoutY="281.0" prefHeight="322.0" prefWidth="368.0" style="-fx-background-color: #CCCCCC;">
+         <children>
+              <ImageView fx:id="imgGrafico" fitHeight="322.0" fitWidth="368.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+    </children>
 </AnchorPane>
