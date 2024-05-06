@@ -76,12 +76,20 @@ public class frmMain {
     private int currentIndex = 1;
     private Timeline animationTimeline;
 
+    /**
+     * Método de inicialización del controlador. Carga los datos de gráficos y configura el ListView.
+     */
     @FXML
     protected void initialize() {
         loadGrhData();
         setupGrhListListener();
     }
 
+    /**
+     * Carga los datos de gráficos desde archivos binarios y actualiza la interfaz de usuario con la información obtenida.
+     * Muestra los índices de gráficos en el ListView y actualiza los textos de los labels con información relevante.
+     * @throws IOException Sí ocurre un error durante la lectura de los archivos binarios.
+     */
     private void loadGrhData() {
         grhData grhDataManager = new grhData(); // Crear una instancia de grhData
         configManager = org.nexus.indexador.utils.configManager.getInstance(); // Inicializar configManager
@@ -110,6 +118,10 @@ public class frmMain {
         }
     }
 
+    /**
+     * Configura un listener para el ListView para capturar los eventos de selección.
+     * Cuando se selecciona un índice de gráfico, actualiza el editor y el visor con la información correspondiente.
+     */
     private void setupGrhListListener() {
         // Agregar un listener al ListView para capturar los eventos de selección
         lstIndices.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -131,6 +143,11 @@ public class frmMain {
         });
     }
 
+    /**
+     * Actualiza el editor con la información del gráfico seleccionado.
+     * Muestra los detalles del gráfico seleccionado en los campos de texto correspondientes.
+     * @param selectedGrh El gráfico seleccionado.
+     */
     private void updateEditor(grhData selectedGrh) {
         // Obtenemos todos los datos
         int fileGrh = selectedGrh.getFileNum();
@@ -149,6 +166,11 @@ public class frmMain {
         txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
     }
 
+    /**
+     * Actualiza el visor con el gráfico seleccionado.
+     * Si el gráfico es estático, muestra la imagen estática correspondiente. Si es una animación, muestra la animación.
+     * @param selectedGrh El gráfico seleccionado.
+     */
     private void updateViewer(grhData selectedGrh) {
         int nFrames = selectedGrh.getNumFrames();
         if (nFrames == 1) {
