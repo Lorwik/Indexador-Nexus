@@ -55,6 +55,9 @@ public class frmMain {
     private TextField txtAlto;
 
     @FXML
+    private TextField txtIndice;
+
+    @FXML
     private ImageView imgIndice;
 
     @FXML
@@ -108,13 +111,22 @@ public class frmMain {
                     // Obtener el objeto grhData correspondiente al índice seleccionado
                     grhData selectedGrh = grhList.get(selectedIndex);
 
+                    // Obtenemos todos los datos
+                    int fileGrh = selectedGrh.getFileNum();
+                    int nFrames = selectedGrh.getNumFrames();
+                    int x = selectedGrh.getsX();
+                    int y = selectedGrh.getsY();
+                    int width = selectedGrh.getTileWidth();
+                    int height = selectedGrh.getTileHeight();
+
                     /** Editor de Grh **/
-                    txtImagen.setText(String.valueOf(selectedGrh.getFileNum()));
-                    txtNumFrames.setText(String.valueOf(selectedGrh.getNumFrames()));
-                    txtPosX.setText(String.valueOf(selectedGrh.getsX()));
-                    txtPosY.setText(String.valueOf(selectedGrh.getsY()));
-                    txtAncho.setText(String.valueOf(selectedGrh.getTileWidth()));
-                    txtAlto.setText(String.valueOf(selectedGrh.getTileHeight()));
+                    txtImagen.setText(String.valueOf(fileGrh));
+                    txtNumFrames.setText(String.valueOf(nFrames));
+                    txtPosX.setText(String.valueOf(x));
+                    txtPosY.setText(String.valueOf(y));
+                    txtAncho.setText(String.valueOf(width));
+                    txtAlto.setText(String.valueOf(height));
+                    txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
 
                     /** VISOR **/
 
@@ -138,10 +150,6 @@ public class frmMain {
                     }
 
                     // Recortar la región adecuada de la imagen completa
-                    int x = selectedGrh.getsX();
-                    int y = selectedGrh.getsY();
-                    int width = selectedGrh.getTileWidth();
-                    int height = selectedGrh.getTileHeight();
                     PixelReader pixelReader = fullImage.getPixelReader();
 
                     WritableImage croppedImage = new WritableImage(pixelReader, x, y, width, height);

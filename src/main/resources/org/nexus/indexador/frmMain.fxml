@@ -27,7 +27,7 @@
       <TextField fx:id="txtAlto" layoutX="742.0" layoutY="209.0" prefHeight="25.0" prefWidth="309.0" />
       <Label fx:id="lblNumFrames" layoutX="684.0" layoutY="89.0" prefWidth="64.0" text="N.Frames:" />
       <TextField fx:id="txtNumFrames" layoutX="742.0" layoutY="85.0" prefHeight="25.0" prefWidth="309.0" />
-      <ImageView fx:id="imgGrafico" fitHeight="354.0" fitWidth="368.0" layoutX="684.0" layoutY="249.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="imgGrafico" fitHeight="322.0" fitWidth="368.0" layoutX="684.0" layoutY="281.0" pickOnBounds="true" preserveRatio="true" />
       <MenuBar fx:id="MnuBar" layoutY="2.0" prefHeight="25.0" prefWidth="1066.0">
         <menus>
           <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
@@ -52,5 +52,7 @@
           </Menu>
         </menus>
       </MenuBar>
+      <Label fx:id="lblIndice" layoutX="685.0" layoutY="245.0" prefWidth="52.0" text="Indice:" />
+      <TextField fx:id="txtIndice" editable="false" layoutX="743.0" layoutY="241.0" prefHeight="25.0" prefWidth="309.0" />
    </children>
 </AnchorPane>

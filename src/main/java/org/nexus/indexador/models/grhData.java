@@ -23,8 +23,9 @@ public class grhData {
     private static long Version;
 
     // Constructor para graficos estaticos
-    public grhData(int grh, int FileNum, int sX, int sY, int TileWidth, int TileHeight){
+    public grhData(int grh, int NumFrames, int FileNum, int sX, int sY, int TileWidth, int TileHeight){
         this.grh = grh;
+        this.NumFrames = NumFrames;
         this.FileNum = FileNum;
         this.sX = sX;
         this.sY = sY;
@@ -111,7 +112,7 @@ public class grhData {
                     int tileWidth = byteMigration.bigToLittle_Short(file.readShort());
                     int tileHeight = byteMigration.bigToLittle_Short(file.readShort());
 
-                    grhData grhData = new grhData(grh, fileNum, x, y, tileWidth, tileHeight);
+                    grhData grhData = new grhData(grh, numFrames, fileNum, x, y, tileWidth, tileHeight);
                     grhList.add(grhData);
 
                 }
