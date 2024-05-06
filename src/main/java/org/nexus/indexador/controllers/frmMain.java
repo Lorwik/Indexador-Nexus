@@ -12,7 +12,6 @@ import javafx.scene.image.WritableImage;
 import org.nexus.indexador.models.grhData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.configManager;
 
 import java.io.File;
