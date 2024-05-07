@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Slider;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +17,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.nexus.indexador.Main;
 import org.nexus.indexador.models.grhData;
@@ -23,7 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.configManager;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -72,6 +74,9 @@ public class frmMain {
     @FXML
     private ImageView imgGrafico;
 
+    @FXML
+    private Slider sldZoom;
+
     private ObservableList<grhData> grhList;
 
     private grhData grhDataManager;
@@ -83,6 +88,9 @@ public class frmMain {
     private int currentIndex = 1;
     private Timeline animationTimeline;
 
+    private double orgSceneX, orgSceneY;
+    private double orgTranslateX, orgTranslateY;
+
     /**
      * Método de inicialización del controlador. Carga los datos de gráficos y configura el ListView.
      */
@@ -91,6 +99,7 @@ public class frmMain {
         loadGrhData();
         setupGrhListListener();
         setupFilterTextFieldListener();
+        setupSliderZoom();
     }
 
     /**
@@ -452,6 +461,39 @@ public class frmMain {
         } else {
             // Si el texto de filtro está vacío, limpiar la selección en el ListView
             lstIndices.getSelectionModel().clearSelection();
+        }
+    }
+
+    private void setupSliderZoom() {
+        // Configuramos el listener para el Slider de zoom
+        sldZoom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            double zoomValue = newValue.doubleValue();
+            // Aplicar la escala al ImageView
+            imgIndice.setScaleX(zoomValue);
+            imgIndice.setScaleY(zoomValue);
+        });
+    }
+
+    @FXML
+    private void onMousePressed(MouseEvent event) {
+        if (event.isSecondaryButtonDown()) {
+            orgSceneX = event.getSceneX();
+            orgSceneY = event.getSceneY();
+            orgTranslateX = ((ImageView)(event.getSource())).getTranslateX();
+            orgTranslateY = ((ImageView)(event.getSource())).getTranslateY();
+        }
+    }
+
+    @FXML
+    private void onMouseDragged(MouseEvent event) {
+        if (event.isSecondaryButtonDown()) {
+            double offsetX = event.getSceneX() - orgSceneX;
+            double offsetY = event.getSceneY() - orgSceneY;
+            double newTranslateX = orgTranslateX + offsetX;
+            double newTranslateY = orgTranslateY + offsetY;
+
+            ((ImageView)(event.getSource())).setTranslateX(newTranslateX);
+            ((ImageView)(event.getSource())).setTranslateY(newTranslateY);
         }
     }
 }

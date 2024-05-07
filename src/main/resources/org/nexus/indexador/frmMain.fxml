@@ -6,6 +6,8 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
@@ -60,17 +62,21 @@
         <TextField fx:id="txtNumFrames" layoutX="737.0" layoutY="405.0" prefHeight="25.0" prefWidth="309.0" />
         <Label fx:id="lblIndice" layoutX="680.0" layoutY="565.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
         <TextField fx:id="txtIndice" editable="false" layoutX="738.0" layoutY="561.0" prefHeight="25.0" prefWidth="309.0" />
-      <Pane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
-         <children>
-      
-              <ImageView fx:id="imgIndice" fitHeight="516.0" fitWidth="436.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
-         </children></Pane>
-      <Pane layoutX="679.0" layoutY="83.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
-         <children>
-              <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
-         </children>
-      </Pane>
+
+        <ScrollPane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #000000;">
+            <content>
+                <ImageView fx:id="imgIndice" layoutX="5.0" layoutY="5.0" onMouseDragged="#onMouseDragged" onMousePressed="#onMousePressed" pickOnBounds="true" preserveRatio="true" smooth="true" />
+            </content>
+        </ScrollPane>
+
+        <Pane layoutX="679.0" layoutY="83.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+            <children>
+                <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+            </children>
+        </Pane>
+
       <Button fx:id="btnAplicar" layoutX="679.0" layoutY="595.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar" textAlignment="CENTER" />
       <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="574.0" prefHeight="25.0" prefWidth="200.0" promptText="Buscar por índice" />
+      <Slider fx:id="sldZoom" layoutX="221.0" layoutY="568.0" max="50.0" min="1.0" prefHeight="36.0" prefWidth="446.0" value="1.0" />
     </children>
 </AnchorPane>
