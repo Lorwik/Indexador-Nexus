@@ -540,6 +540,12 @@ public class frmMain {
         }
     }
 
+    /**
+     * Método que se activa al hacer clic en el botón "Añadir". Incrementa el contador de gráficos (grhCount) en el grhDataManager,
+     * crea un nuevo objeto grhData con valores predeterminados y lo agrega tanto al ListView como al grhList.
+     *
+     * @throws IllegalArgumentException Si ocurre algún error al obtener el contador de gráficos del grhDataManager.
+     */
     @FXML
     private void btnAdd() {
         int grhCount = grhDataManager.getGrhCount() + 1;
