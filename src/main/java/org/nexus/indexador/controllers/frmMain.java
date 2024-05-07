@@ -61,6 +61,9 @@ public class frmMain {
     private TextField txtIndice;
 
     @FXML
+    private TextField txtFiltro;
+
+    @FXML
     private ImageView imgIndice;
 
     @FXML
@@ -84,6 +87,7 @@ public class frmMain {
     protected void initialize() {
         loadGrhData();
         setupGrhListListener();
+        setupFilterTextFieldListener();
     }
 
     /**
@@ -181,6 +185,14 @@ public class frmMain {
         }
     }
 
+    /**
+     * Muestra una imagen estática en el ImageView correspondiente al gráfico seleccionado.
+     * Si el archivo de imagen existe, carga la imagen y la muestra en el ImageView.
+     * Además, recorta la región adecuada de la imagen completa para mostrar solo la parte relevante del gráfico.
+     * Si el archivo de imagen no existe, imprime un mensaje de advertencia.
+     *
+     * @param selectedGrh El gráfico seleccionado.
+     */
     private void displayStaticImage(grhData selectedGrh) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
@@ -212,6 +224,14 @@ public class frmMain {
 
     }
 
+    /**
+     * Muestra una animación en el ImageView correspondiente al gráfico seleccionado.
+     * Configura y ejecuta una animación de fotogramas clave para mostrar la animación.
+     * La animación se ejecuta en un bucle infinito hasta que se detenga explícitamente.
+     *
+     * @param selectedGrh El gráfico seleccionado.
+     * @param nFrames El número total de fotogramas en la animación.
+     */
     private void displayAnimation(grhData selectedGrh, int nFrames) {
         // Configurar la animación
         if (animationTimeline != null) {
@@ -230,6 +250,12 @@ public class frmMain {
         animationTimeline.play(); // Iniciar la animación
     }
 
+    /**
+     * Actualiza el fotograma actual en el ImageView durante la reproducción de una animación.
+     * Obtiene el siguiente fotograma de la animación y actualiza el ImageView con la imagen correspondiente.
+     *
+     * @param selectedGrh El gráfico seleccionado.
+     */
     private void updateFrame(grhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
@@ -245,7 +271,9 @@ public class frmMain {
         }
     }
 
-    // Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
+    /**
+     * Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
+     */
     @FXML
     private void mnuConsola() {
         if (!consoleOpen) {
@@ -274,8 +302,14 @@ public class frmMain {
         }
     }
 
+    /**
+     * Exporta los datos de gráficos al archivo "graficos.ini" en el directorio de exportación configurado.
+     * Los datos exportados incluyen el número total de gráficos, la versión de los índices y la información detallada de cada gráfico.
+     * Si se produce algún error durante el proceso de exportación, se imprime un mensaje de error.
+     */
     @FXML
     private void mnuExportGrh() {
+
         configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
 
         File file = new File(configManager.getExportDir() + "graficos.ini");
@@ -321,6 +355,12 @@ public class frmMain {
         }
     }
 
+    /**
+     * Guarda los cambios realizados en los datos del gráfico seleccionado en la lista.
+     * Obtiene el índice seleccionado de la lista y actualiza los atributos del objeto grhData correspondiente con los valores ingresados en los campos de texto.
+     * Si no hay ningún índice seleccionado, no se realizan cambios.
+     * Se imprime un mensaje indicando que los cambios se han aplicado con éxito.
+     */
     @FXML
     private void saveGrhData() {
         // Obtenemos el índice seleccionado en la lista:
@@ -341,6 +381,48 @@ public class frmMain {
 
             System.out.println(("Cambios aplicados!"));
 
+        }
+    }
+
+    /**
+     * Configura un listener para el TextField de filtro para detectar cambios en su contenido.
+     */
+    private void setupFilterTextFieldListener() {
+        // Agregar un listener al TextField de filtro para detectar cambios en su contenido
+        txtFiltro.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterIndices(newValue); // Llamar al método para filtrar los índices
+        });
+    }
+
+    /**
+     * Filtra los índices en el ListView según el texto proporcionado.
+     * @param filterText El texto utilizado para filtrar los índices.
+     */
+    private void filterIndices(String filterText) {
+        if (!filterText.isEmpty()) {
+            // El texto de filtro no está vacío
+            try {
+                int filterIndex = Integer.parseInt(filterText);
+
+                // Buscar el índice en la lista de índices
+                for (int i = 0; i < grhList.size(); i++) {
+                    if (grhList.get(i).getGrh() == filterIndex) {
+                        // Seleccionar el índice correspondiente en el ListView
+                        lstIndices.getSelectionModel().select(i);
+                        lstIndices.scrollTo(i); // Desplazar el ListView para mostrar el índice seleccionado
+                        return; // Salir del bucle una vez que se encuentre el índice
+                    }
+                }
+
+                // Si no se encuentra el índice, limpiar la selección en el ListView
+                lstIndices.getSelectionModel().clearSelection();
+
+            } catch (NumberFormatException e) {
+                // En caso de que el texto de filtro no sea un número, no hacer nada
+            }
+        } else {
+            // Si el texto de filtro está vacío, limpiar la selección en el ListView
+            lstIndices.getSelectionModel().clearSelection();
         }
     }
 }

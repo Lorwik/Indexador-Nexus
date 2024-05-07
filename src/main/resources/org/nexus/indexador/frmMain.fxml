@@ -71,5 +71,6 @@
          </children>
       </Pane>
       <Button fx:id="btnAplicar" layoutX="679.0" layoutY="595.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar" textAlignment="CENTER" />
+      <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="574.0" prefHeight="25.0" prefWidth="200.0" promptText="Buscar por índice" />
     </children>
 </AnchorPane>
