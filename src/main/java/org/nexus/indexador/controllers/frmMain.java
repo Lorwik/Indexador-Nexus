@@ -3,6 +3,7 @@ package org.nexus.indexador.controllers;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
@@ -353,6 +354,14 @@ public class frmMain {
             // Manejar la excepción de manera adecuada, proporcionando un mensaje de error útil para el usuario
             System.err.println("Error al exportar los datos de gráficos: " + e.getMessage());
         }
+    }
+
+    /**
+     * Cierra la aplicación
+     */
+    @FXML
+    private void mnuClose() {
+        Platform.exit();
     }
 
     /**

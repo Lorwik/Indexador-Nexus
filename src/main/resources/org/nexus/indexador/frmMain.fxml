@@ -19,7 +19,7 @@
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
                   <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh" text="Exportar Indices" />
-                        <MenuItem fx:id="mnuClose" mnemonicParsing="false" text="Cerrar" />
+                        <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose" text="Cerrar" />
                     </items>
                 </Menu>
                 <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
