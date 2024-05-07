@@ -13,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
@@ -24,10 +23,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.configManager;
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class frmMain {
 
@@ -362,6 +364,24 @@ public class frmMain {
     @FXML
     private void mnuClose() {
         Platform.exit();
+    }
+
+    @FXML
+    private void mnuCode() {
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/Lorwik/Indexador-Nexus"));
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("El navegador web no es compatible.");
+            }
+        } else {
+            System.out.println("La funcionalidad de escritorio no es compatible.");
+        }
     }
 
     /**

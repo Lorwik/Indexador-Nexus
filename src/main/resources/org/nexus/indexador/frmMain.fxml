@@ -34,7 +34,7 @@
                 </Menu>
                 <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
                     <items>
-                        <MenuItem fx:id="mnuCode" mnemonicParsing="false" text="Codigo Fuente" />
+                        <MenuItem fx:id="mnuCode" mnemonicParsing="false" onAction="#mnuCode" text="Codigo Fuente" />
                     </items>
                 </Menu>
             </menus>
