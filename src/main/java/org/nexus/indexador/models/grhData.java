@@ -54,6 +54,8 @@ public class grhData {
     public void setTileHeight(int TileHeight) { this.TileHeight = TileHeight; }
     public void setSpeed(int Speed) { this.Speed = Speed; }
     public void setGrh(int grh) { this.grh = grh; }
+    public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
+    public void setVersion(long Version) { this.Version = Version; }
 
     //Metodos GET
     public int getFileNum() { return this.FileNum; }

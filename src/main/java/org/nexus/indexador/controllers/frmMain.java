@@ -6,15 +6,14 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
@@ -26,12 +25,14 @@ import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.configManager;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 public class frmMain {
 
@@ -464,16 +465,28 @@ public class frmMain {
         }
     }
 
+    /**
+     * Configura el deslizador de zoom.
+     * Este método configura un listener para el deslizador de zoom, que ajusta la escala del ImageView
+     * según el valor del deslizador.
+     */
     private void setupSliderZoom() {
-        // Configuramos el listener para el Slider de zoom
         sldZoom.valueProperty().addListener((observable, oldValue, newValue) -> {
             double zoomValue = newValue.doubleValue();
-            // Aplicar la escala al ImageView
+            // Aplica la escala al ImageView
             imgIndice.setScaleX(zoomValue);
             imgIndice.setScaleY(zoomValue);
         });
     }
 
+    /**
+     * Maneja el evento de presionar el mouse.
+     * Este método se invoca cuando el usuario presiona el botón del mouse. Si se presiona el botón
+     * secundario del mouse (generalmente el botón derecho), registra las coordenadas de la escena
+     * iniciales y los valores de traducción del ImageView.
+     *
+     * @param event El MouseEvent que representa el evento de presionar el mouse.
+     */
     @FXML
     private void onMousePressed(MouseEvent event) {
         if (event.isSecondaryButtonDown()) {
@@ -484,6 +497,14 @@ public class frmMain {
         }
     }
 
+    /**
+     * Maneja el evento de arrastrar el mouse.
+     * Este método se invoca cuando el usuario arrastra el mouse después de presionarlo. Si se presiona
+     * el botón secundario del mouse (generalmente el botón derecho), calcula el desplazamiento desde
+     * la posición inicial y actualiza los valores de traducción del ImageView en consecuencia.
+     *
+     * @param event El MouseEvent que representa el evento de arrastrar el mouse.
+     */
     @FXML
     private void onMouseDragged(MouseEvent event) {
         if (event.isSecondaryButtonDown()) {
@@ -496,4 +517,44 @@ public class frmMain {
             ((ImageView)(event.getSource())).setTranslateY(newTranslateY);
         }
     }
+
+    /**
+     * Elimina el elemento seleccionado de la lista de índices.
+     * Muestra un mensaje de confirmación antes de eliminar el elemento.
+     */
+    @FXML
+    private void btnDelete() {
+        int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+        if (selectedIndex != -1) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmación");
+            alert.setHeaderText("¿Estás seguro de que quieres eliminar este elemento?");
+            alert.setContentText("Esta acción no se puede deshacer.");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                lstIndices.getItems().remove(selectedIndex);
+                grhList.remove(selectedIndex);
+            }
+        }
+    }
+
+    @FXML
+    private void btnAdd() {
+        int grhCount = grhDataManager.getGrhCount() + 1;
+
+        // Incrementar el contador de grhDataManager
+        grhDataManager.setGrhCount(grhCount);
+
+        // Crear un nuevo objeto grhData con los valores adecuados
+        grhData newGrhData = new grhData(grhCount, 1, 0, 0, 0, 0, 0);
+
+        // Agregar el nuevo elemento al ListView
+        lstIndices.getItems().add(String.valueOf(grhCount));
+
+        // Agregar el nuevo elemento al grhList
+        grhList.add(newGrhData);
+    }
+
 }
