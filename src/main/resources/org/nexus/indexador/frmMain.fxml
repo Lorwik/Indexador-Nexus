@@ -18,6 +18,7 @@
             <menus>
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
+                  <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh" text="Exportar Indices" />
                         <MenuItem fx:id="mnuClose" mnemonicParsing="false" text="Cerrar" />
                     </items>
                 </Menu>
@@ -28,7 +29,7 @@
                 </Menu>
                 <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
                     <items>
-                        <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#openConsoleWindow" text="Consola" />
+                        <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#mnuConsola" text="Consola" />
                     </items>
                 </Menu>
                 <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">

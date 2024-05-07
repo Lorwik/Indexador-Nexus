@@ -11,6 +11,7 @@ public class configManager {
 
     private String graphicsDir;
     private String initDir;
+    private String exportDir;
 
     private static final String CONFIG_FILE_PATH = "src/main/resources/config.ini";
 
@@ -23,22 +24,16 @@ public class configManager {
         return instance;
     }
 
-    // Getters y setters
-    public String getGraphicsDir() {
-        return graphicsDir;
-    }
+    // Getters
+    public String getGraphicsDir() { return graphicsDir; }
+    public String getInitDir() { return initDir; }
+    public String getExportDir() { return exportDir; }
 
-    public void setGraphicsDir(String graphicsDir) {
-        this.graphicsDir = graphicsDir;
-    }
+    // Setters
+    public void setGraphicsDir(String graphicsDir) { this.graphicsDir = graphicsDir; }
+    public void setInitDir(String initDir) { this.initDir = initDir; }
+    public void setExportDir(String exportDir) { this.exportDir = exportDir; }
 
-    public String getInitDir() {
-        return initDir;
-    }
-
-    public void setInitDir(String initDir) {
-        this.initDir = initDir;
-    }
 
     public void readConfig() throws IOException {
         File configFile = new File(CONFIG_FILE_PATH);
@@ -50,10 +45,15 @@ public class configManager {
                     if (parts.length == 2) {
                         String key = parts[0].trim();
                         String value = parts[1].trim();
+
                         if (key.equals("Graficos")) {
                             graphicsDir = value;
+
                         } else if (key.equals("Init")) {
                             initDir = value;
+
+                        } else if (key.equals("Exportados")) {
+                            exportDir = value;
                         }
                     }
                 }
@@ -66,6 +66,8 @@ public class configManager {
             writer.write("Graficos=" + graphicsDir);
             writer.newLine();
             writer.write("Init=" + initDir);
+            writer.newLine();
+            writer.write("Exportados=" + exportDir);
         }
     }
 

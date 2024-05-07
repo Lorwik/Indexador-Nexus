@@ -68,13 +68,25 @@ public class grhData {
     public int getGrhCount() { return GrhCount; }
     public long getVersion() { return Version; }
 
+    /**
+     * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
+     * Cada gráfico puede ser una imagen estática o una animación.
+     *
+     * @return Una lista observable de objetos grhData que representan los gráficos leídos del archivo.
+     * @throws IOException Si ocurre un error de entrada/salida al leer el archivo.
+     */
     public ObservableList<grhData> readGrhFile() throws IOException {
+
+        // Obtenemos una instancia de configManager
         configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
 
+        // Creamos una lista observable para almacenar los gráficos leídos del archivo
         ObservableList<grhData> grhList = FXCollections.observableArrayList();
 
+        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
+        // Creamos un objeto File para el archivo que contiene los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "Graficos.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
@@ -102,6 +114,7 @@ public class grhData {
 
                     int speed = (int) byteMigration.bigToLittle_Float(file.readFloat());
 
+                    //Creamos un objeto de grhData usando el constructor para animación
                     grhData grhData = new grhData(grh, numFrames, frames, speed);
                     grhList.add(grhData);
 
@@ -112,6 +125,7 @@ public class grhData {
                     int tileWidth = byteMigration.bigToLittle_Short(file.readShort());
                     int tileHeight = byteMigration.bigToLittle_Short(file.readShort());
 
+                    //Creamos un objeto de grhData usando el constructor para imagenes estáticas
                     grhData grhData = new grhData(grh, numFrames, fileNum, x, y, tileWidth, tileHeight);
                     grhList.add(grhData);
 
@@ -134,4 +148,5 @@ public class grhData {
         }
         return grhList;
     }
+
 }

@@ -39,3 +39,4 @@ build/
 
 ### Indexador ###
 src/main/resources/config.ini
+src/main/resources/exportados/*.ini

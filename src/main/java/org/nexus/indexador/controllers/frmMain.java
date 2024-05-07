@@ -23,7 +23,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.configManager;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class frmMain {
@@ -66,6 +68,8 @@ public class frmMain {
 
     private ObservableList<grhData> grhList;
 
+    private grhData grhDataManager;
+
     private configManager configManager;
 
     private static boolean consoleOpen = false; // Variable para rastrear si la ventana de la consola está abierta
@@ -88,7 +92,7 @@ public class frmMain {
      * @throws IOException Sí ocurre un error durante la lectura de los archivos binarios.
      */
     private void loadGrhData() {
-        grhData grhDataManager = new grhData(); // Crear una instancia de grhData
+        grhDataManager = new grhData(); // Crear una instancia de grhData
         configManager = org.nexus.indexador.utils.configManager.getInstance(); // Inicializar configManager
 
         try {
@@ -243,7 +247,7 @@ public class frmMain {
 
     // Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
     @FXML
-    private void openConsoleWindow() {
+    private void mnuConsola() {
         if (!consoleOpen) {
             // Crea la nueva ventana
             Stage consoleStage = new Stage();
@@ -267,6 +271,53 @@ public class frmMain {
                 e.printStackTrace();
 
             }
+        }
+    }
+
+    @FXML
+    private void mnuExportGrh() {
+        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
+
+        File file = new File(configManager.getExportDir() + "graficos.ini");
+
+        System.out.println("Exportando indices, espera...");
+
+        try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
+            bufferWriter.write("[INIT]");
+            bufferWriter.newLine();
+            bufferWriter.write("NumGrh=" + grhDataManager.getGrhCount());
+            bufferWriter.newLine();
+            bufferWriter.write("Version=" + grhDataManager.getVersion());
+            bufferWriter.newLine();
+            bufferWriter.write("[GRAPHICS]");
+            bufferWriter.newLine();
+
+            for (grhData grh : grhList) {
+                if (grh.getNumFrames() > 1) {
+                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-");
+
+                    int[] frames = grh.getFrames();
+
+                    for (int i = 1; i < grh.getNumFrames() + 1; i++) {
+                        bufferWriter.write(frames[i] + "-");
+                    }
+
+                    bufferWriter.write(String.valueOf(grh.getSpeed()));
+
+                } else {
+                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-" +
+                            grh.getFileNum() + "-" + grh.getsX() + "-" + grh.getsY() + "-" +
+                            grh.getTileWidth() + "-" + grh.getTileHeight());
+                }
+                bufferWriter.newLine();
+
+            }
+
+            System.out.println("Indices exportados!");
+
+        } catch (IOException e) {
+            // Manejar la excepción de manera adecuada, proporcionando un mensaje de error útil para el usuario
+            System.err.println("Error al exportar los datos de gráficos: " + e.getMessage());
         }
     }
 
