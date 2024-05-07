@@ -10,20 +10,24 @@ import java.io.*;
 public class grhData {
     //Variables
     private int grh;
-    private int sX;
-    private int sY;
     private int FileNum;
-    private int TileWidth;
-    private int TileHeight;
-    private int NumFrames;
+
     private int Frames[];
-    private int Speed;
+    private short NumFrames;
+
+    private short sX;
+    private short sY;
+
+    private short TileWidth;
+    private short TileHeight;
+
+    private float Speed;
 
     private static int GrhCount;
-    private static long Version;
+    private static int Version;
 
     // Constructor para graficos estaticos
-    public grhData(int grh, int NumFrames, int FileNum, int sX, int sY, int TileWidth, int TileHeight){
+    public grhData(int grh, short NumFrames, int FileNum, short sX, short sY, short TileWidth, short TileHeight){
         this.grh = grh;
         this.NumFrames = NumFrames;
         this.FileNum = FileNum;
@@ -34,7 +38,7 @@ public class grhData {
     }
 
     // Constructor para animaciones
-    public grhData(int grh, int NumFrames, int[] Frames, int Speed) {
+    public grhData(int grh, short NumFrames, int[] Frames, float Speed) {
         this.grh = grh;
         this.NumFrames = NumFrames;
         this.Frames = Frames;
@@ -46,29 +50,29 @@ public class grhData {
 
     //Metodos SET
     public void setFileNum(int FileNum) { this.FileNum = FileNum; }
-    public void setNumFrames(int NumFrames) { this.NumFrames = NumFrames; }
+    public void setNumFrames(short NumFrames) { this.NumFrames = NumFrames; }
     public void setFrames(int[] Frames) { this.Frames = Frames; } //En caso de que sea una animaci�n
-    public void setsX(int sX) { this.sX = sX; }
-    public void setsY(int sY) { this.sY = sY; }
-    public void setTileWidth(int TileWidth) { this.TileWidth = TileWidth; }
-    public void setTileHeight(int TileHeight) { this.TileHeight = TileHeight; }
-    public void setSpeed(int Speed) { this.Speed = Speed; }
+    public void setsX(short sX) { this.sX = sX; }
+    public void setsY(short sY) { this.sY = sY; }
+    public void setTileWidth(short TileWidth) { this.TileWidth = TileWidth; }
+    public void setTileHeight(short TileHeight) { this.TileHeight = TileHeight; }
+    public void setSpeed(float Speed) { this.Speed = Speed; }
     public void setGrh(int grh) { this.grh = grh; }
     public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
-    public void setVersion(long Version) { this.Version = Version; }
+    public void setVersion(int Version) { this.Version = Version; }
 
     //Metodos GET
     public int getFileNum() { return this.FileNum; }
-    public int getNumFrames() { return this.NumFrames; }
+    public short getNumFrames() { return this.NumFrames; }
     public int[] getFrames() { return this.Frames; } //En caso de que sea una animaci�n
-    public int getsX() { return this.sX; }
-    public int getsY() { return this.sY; }
-    public int getTileWidth() { return this.TileWidth; }
-    public int getTileHeight() { return this.TileHeight; }
-    public int getSpeed() {return this.Speed; }
+    public short getsX() { return this.sX; }
+    public short getsY() { return this.sY; }
+    public short getTileWidth() { return this.TileWidth; }
+    public short getTileHeight() { return this.TileHeight; }
+    public float getSpeed() {return this.Speed; }
     public int getGrh() { return grh; }
     public int getGrhCount() { return GrhCount; }
-    public long getVersion() { return Version; }
+    public int getVersion() { return Version; }
 
     /**
      * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
@@ -106,7 +110,7 @@ public class grhData {
             //Mientras no llegue al final del archivo leemos...
             for (;;) {
                 int grh = byteMigration.bigToLittle_Int(file.readInt());
-                int numFrames = byteMigration.bigToLittle_Short(file.readShort());
+                short numFrames = byteMigration.bigToLittle_Short(file.readShort());
 
                 if (numFrames > 1) { // Es una animación
                     int[] frames = new int[numFrames + 1];
@@ -122,10 +126,10 @@ public class grhData {
 
                 } else { // Es una sola imagen
                     int fileNum = byteMigration.bigToLittle_Int(file.readInt());
-                    int x = byteMigration.bigToLittle_Short(file.readShort());
-                    int y = byteMigration.bigToLittle_Short(file.readShort());
-                    int tileWidth = byteMigration.bigToLittle_Short(file.readShort());
-                    int tileHeight = byteMigration.bigToLittle_Short(file.readShort());
+                    short x = byteMigration.bigToLittle_Short(file.readShort());
+                    short y = byteMigration.bigToLittle_Short(file.readShort());
+                    short tileWidth = byteMigration.bigToLittle_Short(file.readShort());
+                    short tileHeight = byteMigration.bigToLittle_Short(file.readShort());
 
                     //Creamos un objeto de grhData usando el constructor para imagenes estáticas
                     grhData grhData = new grhData(grh, numFrames, fileNum, x, y, tileWidth, tileHeight);

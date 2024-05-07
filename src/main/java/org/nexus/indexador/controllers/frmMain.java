@@ -22,14 +22,11 @@ import org.nexus.indexador.Main;
 import org.nexus.indexador.models.grhData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.configManager;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -196,6 +193,7 @@ public class frmMain {
         } else {
             displayAnimation(selectedGrh, nFrames);
         }
+
     }
 
     /**
@@ -412,11 +410,11 @@ public class frmMain {
 
             // Comenzamos aplicar los cambios:
             selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
-            selectedGrh.setNumFrames((Integer.parseInt(txtNumFrames.getText())));
-            selectedGrh.setsX(Integer.parseInt(txtPosX.getText()));
-            selectedGrh.setsY(Integer.parseInt(txtPosY.getText()));
-            selectedGrh.setTileWidth(Integer.parseInt(txtAncho.getText()));
-            selectedGrh.setTileHeight(Integer.parseInt(txtAlto.getText()));
+            selectedGrh.setNumFrames((Short.parseShort(txtNumFrames.getText())));
+            selectedGrh.setsX(Short.parseShort(txtPosX.getText()));
+            selectedGrh.setsY(Short.parseShort(txtPosY.getText()));
+            selectedGrh.setTileWidth(Short.parseShort(txtAncho.getText()));
+            selectedGrh.setTileHeight(Short.parseShort(txtAlto.getText()));
 
             System.out.println(("Cambios aplicados!"));
 
@@ -554,13 +552,73 @@ public class frmMain {
         grhDataManager.setGrhCount(grhCount);
 
         // Crear un nuevo objeto grhData con los valores adecuados
-        grhData newGrhData = new grhData(grhCount, 1, 0, 0, 0, 0, 0);
+        grhData newGrhData = new grhData(grhCount, (short) 1, 0, (short) 0, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstIndices.getItems().add(String.valueOf(grhCount));
 
         // Agregar el nuevo elemento al grhList
         grhList.add(newGrhData);
+    }
+
+    @FXML
+    private void mnuIndexbyMemory() throws IOException {
+
+        // Obtenemos una instancia de configManager
+        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
+
+        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
+        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+
+        // Creamos un objeto File para el archivo en el que se escribirán los datos de los gráficos
+        File archivo = new File(configManager.getInitDir() + "Graficos.ind");
+
+        System.out.println("Iniciando el guardado de indices desde memoria.");
+
+        try (RandomAccessFile file = new RandomAccessFile(archivo, "rw")) {
+
+            // Nos posicionamos al inicio del fichero
+            file.seek(0);
+
+            // Escribimos la versión del archivo
+            file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getVersion()));
+
+            // Escribimos la cantidad de Grh indexados
+            file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getGrhCount()));
+
+            // Escribimos cada gráfico en el archivo
+            for (grhData grh : grhList) {
+                // Escribimos el número de gráfico y el número de frames
+                file.writeInt(byteMigration.bigToLittle_Int(grh.getGrh()));
+                file.writeShort(byteMigration.bigToLittle_Short(grh.getNumFrames()));
+
+                // Si es una animación, escribimos los frames y la velocidad
+                if (grh.getNumFrames() > 1) {
+
+                    int[] frames = grh.getFrames();
+
+                    for (int i = 1; i <= grh.getNumFrames(); i++) {
+                        file.writeInt(byteMigration.bigToLittle_Int(frames[i]));
+                    }
+
+                    file.writeFloat(byteMigration.bigToLittle_Float(grh.getSpeed()));
+
+                } else { // Si es una imagen estática, escribimos el resto de los datos
+                    file.writeInt(byteMigration.bigToLittle_Int(grh.getFileNum()));
+                    file.writeShort(byteMigration.bigToLittle_Short(grh.getsX()));
+                    file.writeShort(byteMigration.bigToLittle_Short(grh.getsY()));
+                    file.writeShort(byteMigration.bigToLittle_Short(grh.getTileWidth()));
+                    file.writeShort(byteMigration.bigToLittle_Short(grh.getTileHeight()));
+                }
+            }
+
+            System.out.println("Indices guardados!");
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw e; // Relanzar la excepción para manejarla fuera del método
+        }
+
     }
 
 }

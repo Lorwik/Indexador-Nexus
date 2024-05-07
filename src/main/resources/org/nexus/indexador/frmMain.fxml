@@ -20,7 +20,20 @@
             <menus>
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
-                  <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh" text="Exportar Indices" />
+                  <Menu mnemonicParsing="false" text="Exportar">
+                    <items>
+                        <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh" text="Indices" />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Indexar">
+                    <items>
+                        <Menu mnemonicParsing="false" text="Memoria...">
+                          <items>
+                            <MenuItem fx:id="mnuIndexbyMemory" mnemonicParsing="false" onAction="#mnuIndexbyMemory" text="Indice" />
+                          </items>
+                        </Menu>
+                    </items>
+                  </Menu>
                         <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose" text="Cerrar" />
                     </items>
                 </Menu>
@@ -71,7 +84,7 @@
 
         <Pane layoutX="679.0" layoutY="83.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
             <children>
-                <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="false" />
             </children>
         </Pane>
 
