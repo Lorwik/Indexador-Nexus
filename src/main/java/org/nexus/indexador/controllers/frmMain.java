@@ -64,9 +64,6 @@ public class frmMain {
     @FXML
     private ImageView imgGrafico;
 
-    @FXML
-    private MenuItem mnuConsola;
-
     private ObservableList<grhData> grhList;
 
     private configManager configManager;
@@ -270,6 +267,29 @@ public class frmMain {
                 e.printStackTrace();
 
             }
+        }
+    }
+
+    @FXML
+    private void saveGrhData() {
+        // Obtenemos el índice seleccionado en la lista:
+        int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+        // Nos aseguramos de que el índice es válido
+        if (selectedIndex >= 0) {
+            // Obtenemos el objeto grhData correspondiente al índice seleccionado
+            grhData selectedGrh = grhList.get(selectedIndex);
+
+            // Comenzamos aplicar los cambios:
+            selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
+            selectedGrh.setNumFrames((Integer.parseInt(txtNumFrames.getText())));
+            selectedGrh.setsX(Integer.parseInt(txtPosX.getText()));
+            selectedGrh.setsY(Integer.parseInt(txtPosY.getText()));
+            selectedGrh.setTileWidth(Integer.parseInt(txtAncho.getText()));
+            selectedGrh.setTileHeight(Integer.parseInt(txtAlto.getText()));
+
+            System.out.println(("Cambios aplicados!"));
+
         }
     }
 }

@@ -1,34 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane fx:id="paneMain" maxHeight="617.0" maxWidth="1066.0" minHeight="617.0" minWidth="1066.0" prefHeight="617.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
+<AnchorPane fx:id="paneMain" maxHeight="649.0" maxWidth="1516.0" minHeight="617.0" minWidth="1066.0" prefHeight="629.0" prefWidth="1066.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
     <children>
-        <Label fx:id="lblIndices" layoutX="14.0" layoutY="36.0" prefWidth="200.0" text="Indices cargados: 0" />
-        <ListView fx:id="lstIndices" layoutX="14.0" layoutY="75.0" prefHeight="526.0" prefWidth="200.0" />
-        <Label fx:id="lblVersion" layoutX="14.0" layoutY="53.0" prefWidth="200.0" text="Versión: 0" />
-
-        <Label fx:id="lblImagen" layoutX="684.0" layoutY="57.0" prefWidth="52.0" text="Imagen:" />
-        <TextField fx:id="txtImagen" layoutX="742.0" layoutY="53.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblPosX" layoutX="684.0" layoutY="120.0" prefWidth="52.0" text="Pos X:" />
-        <TextField fx:id="txtPosX" layoutX="742.0" layoutY="116.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblPosY" layoutX="684.0" layoutY="151.0" prefWidth="52.0" text="Pos Y:" />
-        <TextField fx:id="txtPosY" layoutX="742.0" layoutY="147.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblAncho" layoutX="684.0" layoutY="182.0" prefWidth="52.0" text="Ancho:" />
-        <TextField fx:id="txtAncho" layoutX="742.0" layoutY="178.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblAlto" layoutX="684.0" layoutY="213.0" prefWidth="52.0" text="Alto:" />
-        <TextField fx:id="txtAlto" layoutX="742.0" layoutY="209.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblNumFrames" layoutX="684.0" layoutY="89.0" prefWidth="64.0" text="N.Frames:" />
-        <TextField fx:id="txtNumFrames" layoutX="742.0" layoutY="85.0" prefHeight="25.0" prefWidth="309.0" />
-        <MenuBar fx:id="MnuBar" layoutY="2.0" prefHeight="25.0" prefWidth="1066.0">
+        <MenuBar fx:id="MnuBar" prefHeight="25.0" prefWidth="1066.0" style="-fx-background-color: #999999;">
             <menus>
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
@@ -51,18 +37,38 @@
                     </items>
                 </Menu>
             </menus>
+         <effect>
+            <DropShadow />
+         </effect>
         </MenuBar>
-        <Label fx:id="lblIndice" layoutX="685.0" layoutY="245.0" prefWidth="52.0" text="Indice:" />
-        <TextField fx:id="txtIndice" editable="false" layoutX="743.0" layoutY="241.0" prefHeight="25.0" prefWidth="309.0" />
-      <Pane fx:id="PaneGrhView" layoutX="225.0" layoutY="78.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #CCCCCC;">
+        <Label fx:id="lblIndices" layoutX="679.0" layoutY="41.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Indices cargados: 0" textFill="WHITE" />
+        <ListView fx:id="lstIndices" layoutX="12.0" layoutY="41.0" prefHeight="526.0" prefWidth="200.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
+        <Label fx:id="lblVersion" layoutX="679.0" layoutY="58.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Versión: 0" textFill="WHITE" />
+
+        <Label fx:id="lblImagen" layoutX="679.0" layoutY="377.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Imagen:" textFill="WHITE" />
+        <TextField fx:id="txtImagen" layoutX="737.0" layoutY="373.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblPosX" layoutX="679.0" layoutY="440.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos X:" textFill="WHITE" />
+        <TextField fx:id="txtPosX" layoutX="737.0" layoutY="436.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblPosY" layoutX="679.0" layoutY="471.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos Y:" textFill="WHITE" />
+        <TextField fx:id="txtPosY" layoutX="737.0" layoutY="467.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblAncho" layoutX="679.0" layoutY="502.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Ancho:" textFill="WHITE" />
+        <TextField fx:id="txtAncho" layoutX="737.0" layoutY="498.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblAlto" layoutX="679.0" layoutY="533.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Alto:" textFill="WHITE" />
+        <TextField fx:id="txtAlto" layoutX="737.0" layoutY="529.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblNumFrames" layoutX="679.0" layoutY="409.0" prefWidth="64.0" style="-fx-background-color: #424242;" text="N.Frames:" textFill="WHITE" />
+        <TextField fx:id="txtNumFrames" layoutX="737.0" layoutY="405.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblIndice" layoutX="680.0" layoutY="565.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
+        <TextField fx:id="txtIndice" editable="false" layoutX="738.0" layoutY="561.0" prefHeight="25.0" prefWidth="309.0" />
+      <Pane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
          <children>
       
-              <ImageView fx:id="imgIndice" fitHeight="526.0" fitWidth="446.0" pickOnBounds="true" preserveRatio="true" />
+              <ImageView fx:id="imgIndice" fitHeight="516.0" fitWidth="436.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
          </children></Pane>
-      <Pane layoutX="685.0" layoutY="281.0" prefHeight="322.0" prefWidth="368.0" style="-fx-background-color: #CCCCCC;">
+      <Pane layoutX="679.0" layoutY="83.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
          <children>
-              <ImageView fx:id="imgGrafico" fitHeight="322.0" fitWidth="368.0" pickOnBounds="true" preserveRatio="true" />
+              <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </Pane>
+      <Button fx:id="btnAplicar" layoutX="679.0" layoutY="595.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar" textAlignment="CENTER" />
     </children>
 </AnchorPane>
