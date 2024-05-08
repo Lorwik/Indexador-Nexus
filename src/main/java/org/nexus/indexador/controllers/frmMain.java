@@ -6,9 +6,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +14,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.nexus.indexador.Main;
 import org.nexus.indexador.models.grhData;
@@ -71,6 +72,9 @@ public class frmMain {
 
     @FXML
     private ImageView imgGrafico;
+
+    @FXML
+    private Rectangle rectanguloIndice;
 
     @FXML
     private Slider sldZoom;
@@ -209,10 +213,14 @@ public class frmMain {
         String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
         File imageFile = new File(imagePath);
 
+        // ¿La imagen existe?
         if (imageFile.exists()) {
+
             // El archivo existe, cargar la imagen
             Image staticImage = new Image(imageFile.toURI().toString());
-            imgGrafico.setImage(staticImage);
+
+            //Mandamos a dibujar el grafico completo en otro ImageView
+            drawFullImage(staticImage, selectedGrh);
 
             // Recortar la región adecuada de la imagen completa
             PixelReader pixelReader = staticImage.getPixelReader();
@@ -275,11 +283,62 @@ public class frmMain {
             grhData currentGrh = grhList.get(frames[currentIndex]);
             String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
 
-            Image frameImage = new Image(imagePath);
-            PixelReader pixelReader = frameImage.getPixelReader();
-            WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
-            imgIndice.setImage(croppedImage);
+            File imageFile = new File(imagePath);
+
+            // ¿La imagen existe?
+            if (imageFile.exists()) {
+
+                Image frameImage = new Image(imagePath);
+
+                //Mandamos a dibujar el grafico completo en otro ImageView
+                drawFullImage(frameImage, selectedGrh);
+
+                PixelReader pixelReader = frameImage.getPixelReader();
+                WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
+                imgIndice.setImage(croppedImage);
+
+            } else {
+                // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
+                System.out.println("El archivo de imagen no existe: " + imagePath);
+
+            }
         }
+    }
+
+    /**
+     * Dibuja la imagen completa del gráfico en el ImageView y dibuja un rectángulo alrededor de la región del índice.
+     *
+     * @param grhImage La imagen completa del gráfico.
+     * @param selectedGrh El gráfico seleccionado que contiene la información de la región del índice.
+     */
+    private void drawFullImage(Image grhImage, grhData selectedGrh) {
+        // Dibuja la imagen completa del gráfico en el ImageView
+        imgGrafico.setImage(grhImage);
+
+        // Dibuja un rectángulo alrededor de la región del índice en la imagen completa del gráfico
+        drawRectangle(selectedGrh);
+    }
+
+    /**
+     * Dibuja un rectángulo alrededor de la región específica del gráfico en el ImageView.
+     * @param selectedGrh El gráfico seleccionado.
+     */
+    private void drawRectangle(grhData selectedGrh) {
+        // Obtener las dimensiones del ImageView imgGrafico
+        double imgWidth = imgGrafico.getBoundsInLocal().getWidth();
+        double imgHeight = imgGrafico.getBoundsInLocal().getHeight();
+
+        // Obtener las coordenadas del rectángulo en relación con las coordenadas del ImageView
+        double rectX = (selectedGrh.getsX() * imgWidth) / imgGrafico.getImage().getWidth() + 5;
+        double rectY = (selectedGrh.getsY() * imgHeight) / imgGrafico.getImage().getHeight() + 5;
+        double rectWidth = (selectedGrh.getTileWidth() * imgWidth) / imgGrafico.getImage().getWidth();
+        double rectHeight = (selectedGrh.getTileHeight() * imgHeight) / imgGrafico.getImage().getHeight();
+
+        // Configurar las propiedades del rectángulo
+        rectanguloIndice.setX(rectX);
+        rectanguloIndice.setY(rectY);
+        rectanguloIndice.setWidth(rectWidth);
+        rectanguloIndice.setHeight(rectHeight);
     }
 
     /**
@@ -561,49 +620,50 @@ public class frmMain {
         grhList.add(newGrhData);
     }
 
+    /**
+     * Guarda los datos de los gráficos en memoria en un archivo binario.
+     * Los datos incluyen la versión del archivo, la cantidad de gráficos indexados y la información de cada gráfico.
+     * Si el archivo no existe, se crea. Si existe, se sobrescribe.
+     * Se utilizan las instancias de `configManager` y `byteMigration` para manejar la configuración y la conversión de bytes.
+     *
+     * @throws IOException Si ocurre un error de entrada/salida al intentar escribir en el archivo.
+     */
     @FXML
     private void mnuIndexbyMemory() throws IOException {
-
-        // Obtenemos una instancia de configManager
+        // Obtener instancias de configManager y byteMigration
         configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-
-        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
-        // Creamos un objeto File para el archivo en el que se escribirán los datos de los gráficos
+        // Crear un objeto File para el archivo donde se guardarán los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "Graficos.ind");
 
-        System.out.println("Iniciando el guardado de indices desde memoria.");
+        // Imprimir mensaje de inicio
+        System.out.println("Iniciando el guardado de índices desde memoria.");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "rw")) {
-
-            // Nos posicionamos al inicio del fichero
+            // Posicionarse al inicio del archivo
             file.seek(0);
 
-            // Escribimos la versión del archivo
+            // Escribir la versión del archivo
             file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getVersion()));
 
-            // Escribimos la cantidad de Grh indexados
+            // Escribir la cantidad de gráficos indexados
             file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getGrhCount()));
 
-            // Escribimos cada gráfico en el archivo
+            // Escribir cada gráfico en el archivo
             for (grhData grh : grhList) {
-                // Escribimos el número de gráfico y el número de frames
+                // Escribir el número de gráfico y el número de frames
                 file.writeInt(byteMigration.bigToLittle_Int(grh.getGrh()));
                 file.writeShort(byteMigration.bigToLittle_Short(grh.getNumFrames()));
 
-                // Si es una animación, escribimos los frames y la velocidad
+                // Si es una animación, escribir los frames y la velocidad
                 if (grh.getNumFrames() > 1) {
-
                     int[] frames = grh.getFrames();
-
                     for (int i = 1; i <= grh.getNumFrames(); i++) {
                         file.writeInt(byteMigration.bigToLittle_Int(frames[i]));
                     }
-
                     file.writeFloat(byteMigration.bigToLittle_Float(grh.getSpeed()));
-
-                } else { // Si es una imagen estática, escribimos el resto de los datos
+                } else { // Si es una imagen estática, escribir el resto de los datos
                     file.writeInt(byteMigration.bigToLittle_Int(grh.getFileNum()));
                     file.writeShort(byteMigration.bigToLittle_Short(grh.getsX()));
                     file.writeShort(byteMigration.bigToLittle_Short(grh.getsY()));
@@ -612,13 +672,12 @@ public class frmMain {
                 }
             }
 
-            System.out.println("Indices guardados!");
-
+            // Imprimir mensaje de éxito
+            System.out.println("¡Índices guardados!");
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
-
     }
 
 }
