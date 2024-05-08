@@ -31,11 +31,16 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public class frmMain {
 
     @FXML
     private ListView<String> lstIndices;
+
+    @FXML
+    private ListView<String> lstFrames;
 
     @FXML
     private Label lblIndices;
@@ -45,9 +50,6 @@ public class frmMain {
 
     @FXML
     private TextField txtImagen;
-
-    @FXML
-    private TextField txtNumFrames;
 
     @FXML
     private TextField txtPosX;
@@ -63,6 +65,9 @@ public class frmMain {
 
     @FXML
     private TextField txtIndice;
+
+    @FXML
+    private TextField txtSpeed;
 
     @FXML
     private TextField txtFiltro;
@@ -175,14 +180,41 @@ public class frmMain {
         int y = selectedGrh.getsY();
         int width = selectedGrh.getTileWidth();
         int height = selectedGrh.getTileHeight();
+        float speed = selectedGrh.getSpeed();
 
         txtImagen.setText(String.valueOf(fileGrh));
-        txtNumFrames.setText(String.valueOf(nFrames));
         txtPosX.setText(String.valueOf(x));
         txtPosY.setText(String.valueOf(y));
         txtAncho.setText(String.valueOf(width));
         txtAlto.setText(String.valueOf(height));
-        txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
+        txtSpeed.setText(String.valueOf(speed));
+
+        if (nFrames == 1) { // ¿Es estatico?
+
+            txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + "-" + fileGrh + "-" + x + "-" + y + "-" + width + "-" + height);
+
+            lstFrames.getItems().clear();
+
+        } else { // Entonces es animación...
+
+            StringBuilder frameText = new StringBuilder();
+
+            // Agregar los índices de gráficos al ListView
+            ObservableList<String> grhIndices = FXCollections.observableArrayList();
+
+            int[] frames = selectedGrh.getFrames();
+
+            for (int i = 1; i < selectedGrh.getNumFrames() + 1; i++) {
+                String frame = String.valueOf(frames[i]);
+                grhIndices.add(frame);
+
+                frameText.append("-").append(frame);
+            }
+
+            lstFrames.setItems(grhIndices);
+
+            txtIndice.setText("Grh" + selectedGrh.getGrh() + "=" + nFrames + frameText + "-" + speed);
+        }
     }
 
     /**
@@ -238,7 +270,7 @@ public class frmMain {
 
         } else {
             // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-            System.out.println("El archivo de imagen no existe: " + imagePath);
+            System.out.println("displayStaticImage: El archivo de imagen no existe: " + imagePath);
         }
 
     }
@@ -278,9 +310,9 @@ public class frmMain {
     private void updateFrame(grhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
-        if (currentIndex > 0) {
-
+        if (currentIndex > 0 && currentIndex < frames.length) {
             grhData currentGrh = grhList.get(frames[currentIndex]);
+
             String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
 
             File imageFile = new File(imagePath);
@@ -299,7 +331,7 @@ public class frmMain {
 
             } else {
                 // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-                System.out.println("El archivo de imagen no existe: " + imagePath);
+                System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
 
             }
         }
@@ -469,7 +501,6 @@ public class frmMain {
 
             // Comenzamos aplicar los cambios:
             selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
-            selectedGrh.setNumFrames((Short.parseShort(txtNumFrames.getText())));
             selectedGrh.setsX(Short.parseShort(txtPosX.getText()));
             selectedGrh.setsY(Short.parseShort(txtPosY.getText()));
             selectedGrh.setTileWidth(Short.parseShort(txtAncho.getText()));
@@ -580,7 +611,7 @@ public class frmMain {
      * Muestra un mensaje de confirmación antes de eliminar el elemento.
      */
     @FXML
-    private void btnDelete() {
+    private void btnDelete_OnAction() {
         int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
 
         if (selectedIndex != -1) {
@@ -604,7 +635,7 @@ public class frmMain {
      * @throws IllegalArgumentException Si ocurre algún error al obtener el contador de gráficos del grhDataManager.
      */
     @FXML
-    private void btnAdd() {
+    private void btnAdd_OnAction() {
         int grhCount = grhDataManager.getGrhCount() + 1;
 
         // Incrementar el contador de grhDataManager
@@ -680,4 +711,13 @@ public class frmMain {
         }
     }
 
+    @FXML
+    private void btnAddFrame_OnAction() {
+
+    }
+
+    @FXML
+    private void btnRemoveFrame_OnAction() {
+
+    }
 }

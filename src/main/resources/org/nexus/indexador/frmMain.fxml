@@ -8,16 +8,18 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
-
 <?import javafx.scene.shape.Rectangle?>
-<AnchorPane fx:id="paneMain" maxHeight="649.0" maxWidth="1516.0" minHeight="617.0" minWidth="1066.0" prefHeight="643.0" prefWidth="1066.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
+
+<AnchorPane fx:id="paneMain" maxHeight="649.0" maxWidth="1516.0" minHeight="617.0" minWidth="1064.0" prefHeight="649.0" prefWidth="1065.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
     <children>
-        <MenuBar fx:id="MnuBar" prefHeight="25.0" prefWidth="1066.0" style="-fx-background-color: #999999;">
+        <MenuBar fx:id="MnuBar" prefHeight="25.0" prefWidth="1065.0" style="-fx-background-color: #999999;">
             <menus>
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
@@ -60,22 +62,9 @@
         </MenuBar>
         <Label fx:id="lblIndices" layoutX="679.0" layoutY="41.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Indices cargados: 0" textFill="WHITE" />
         <ListView fx:id="lstIndices" layoutX="12.0" layoutY="41.0" prefHeight="526.0" prefWidth="200.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
-        <Label fx:id="lblVersion" layoutX="679.0" layoutY="58.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Versión: 0" textFill="WHITE" />
-
-        <Label fx:id="lblImagen" layoutX="678.0" layoutY="385.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Imagen:" textFill="WHITE" />
-        <TextField fx:id="txtImagen" layoutX="736.0" layoutY="383.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblPosX" layoutX="678.0" layoutY="445.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos X:" textFill="WHITE" />
-        <TextField fx:id="txtPosX" layoutX="736.0" layoutY="443.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblPosY" layoutX="678.0" layoutY="475.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos Y:" textFill="WHITE" />
-        <TextField fx:id="txtPosY" layoutX="736.0" layoutY="473.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblAncho" layoutX="678.0" layoutY="505.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Ancho:" textFill="WHITE" />
-        <TextField fx:id="txtAncho" layoutX="736.0" layoutY="503.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblAlto" layoutX="678.0" layoutY="535.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Alto:" textFill="WHITE" />
-        <TextField fx:id="txtAlto" layoutX="736.0" layoutY="533.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblNumFrames" layoutX="678.0" layoutY="415.0" prefWidth="64.0" style="-fx-background-color: #424242;" text="N.Frames:" textFill="WHITE" />
-        <TextField fx:id="txtNumFrames" layoutX="736.0" layoutY="413.0" prefHeight="25.0" prefWidth="309.0" />
-        <Label fx:id="lblIndice" layoutX="679.0" layoutY="565.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
-        <TextField fx:id="txtIndice" editable="false" layoutX="736.0" layoutY="563.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblVersion" layoutX="899.0" layoutY="41.0" prefHeight="17.0" prefWidth="156.0" style="-fx-background-color: #424242;" text="Versión: 0" textFill="WHITE" />
+        <Label fx:id="lblIndice" layoutX="679.0" layoutY="576.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
+        <TextField fx:id="txtIndice" editable="false" layoutX="736.0" layoutY="574.0" prefHeight="25.0" prefWidth="309.0" />
 
         <ScrollPane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #000000;">
             <content>
@@ -83,17 +72,53 @@
             </content>
         </ScrollPane>
 
-        <Pane layoutX="679.0" layoutY="83.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+        <Pane layoutX="674.0" layoutY="67.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
             <children>
                 <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="false" />
-                <Rectangle fx:id="rectanguloIndice" stroke="RED" strokeWidth="1.0" fill="TRANSPARENT" />
+                <Rectangle fx:id="rectanguloIndice" fill="TRANSPARENT" stroke="RED" strokeWidth="1.0" />
             </children>
         </Pane>
 
-      <Button fx:id="btnAplicar" layoutX="678.0" layoutY="603.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar" textAlignment="CENTER" />
+      <Button fx:id="btnAplicar" layoutX="678.0" layoutY="608.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar cambios" textAlignment="CENTER" />
       <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="574.0" prefHeight="25.0" prefWidth="200.0" promptText="Buscar por índice" />
       <Slider fx:id="sldZoom" layoutX="221.0" layoutY="568.0" max="50.0" min="1.0" prefHeight="66.0" prefWidth="446.0" value="1.0" />
-      <Button fx:id="btnAdd" layoutX="108.0" layoutY="603.0" mnemonicParsing="false" onAction="#btnAdd" prefHeight="25.0" prefWidth="104.0" text="Añadir" />
-      <Button fx:id="btnDelete" layoutX="14.0" layoutY="603.0" mnemonicParsing="false" onAction="#btnDelete" prefHeight="25.0" prefWidth="92.0" text="Borrar" />
+      <Button fx:id="btnAdd" layoutX="108.0" layoutY="608.0" mnemonicParsing="false" onAction="#btnAdd_OnAction" prefHeight="25.0" prefWidth="104.0" text="Nuevo" />
+      <Button fx:id="btnDelete" layoutX="14.0" layoutY="608.0" mnemonicParsing="false" onAction="#btnDelete_OnAction" prefHeight="25.0" prefWidth="92.0" text="Remover" />
+      <TabPane layoutX="679.0" layoutY="355.0" prefHeight="210.0" prefWidth="368.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Estatico">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="297.0" prefWidth="368.0">
+                     <children>
+                  
+                          <Label fx:id="lblImagen" layoutX="14.0" layoutY="24.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Imagen:" textFill="WHITE" />
+                          <TextField fx:id="txtImagen" layoutX="78.0" layoutY="20.0" prefHeight="25.0" prefWidth="275.0" />
+                          <Label fx:id="lblPosX" layoutX="14.0" layoutY="54.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos X:" textFill="WHITE" />
+                          <TextField fx:id="txtPosX" layoutX="78.0" layoutY="50.0" prefHeight="25.0" prefWidth="275.0" />
+                          <Label fx:id="lblPosY" layoutX="14.0" layoutY="82.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Pos Y:" textFill="WHITE" />
+                          <TextField fx:id="txtPosY" layoutX="78.0" layoutY="80.0" prefHeight="25.0" prefWidth="275.0" />
+                          <Label fx:id="lblAncho" layoutX="15.0" layoutY="114.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Ancho:" textFill="WHITE" />
+                          <TextField fx:id="txtAncho" layoutX="78.0" layoutY="110.0" prefHeight="25.0" prefWidth="275.0" />
+                          <Label fx:id="lblAlto" layoutX="15.0" layoutY="144.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Alto:" textFill="WHITE" />
+                          <TextField fx:id="txtAlto" layoutX="78.0" layoutY="140.0" prefHeight="25.0" prefWidth="275.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Animación">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblNumFrames1" layoutX="14.0" layoutY="154.0" prefWidth="64.0" style="-fx-background-color: #424242;" text="Speed:" textFill="WHITE" />
+                        <TextField fx:id="txtSpeed" layoutX="56.0" layoutY="150.0" prefHeight="25.0" prefWidth="86.0" />
+                        <ListView fx:id="lstFrames" layoutX="154.0" layoutY="8.0" prefHeight="166.0" prefWidth="200.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
+                        <Button fx:id="btnAddFrame" layoutX="21.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnAddFrame_OnAction" prefHeight="25.0" prefWidth="114.0" text="Añadir Grh Sel." />
+                        <Button fx:id="btnRemoveFrame" layoutX="20.0" layoutY="49.0" mnemonicParsing="false" onAction="#btnRemoveFrame_OnAction" prefHeight="25.0" prefWidth="114.0" text="Remover" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
     </children>
 </AnchorPane>
