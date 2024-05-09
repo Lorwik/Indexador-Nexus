@@ -31,8 +31,6 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
-import java.util.ArrayList;
-import java.util.List;
 
 public class frmMain {
 
@@ -84,19 +82,21 @@ public class frmMain {
     @FXML
     private Slider sldZoom;
 
-    private ObservableList<grhData> grhList;
+    private ObservableList<grhData> grhList; // Lista observable que contiene los datos de los gráficos indexados.
 
-    private grhData grhDataManager;
+    private grhData grhDataManager; // Objeto que gestiona los datos de los gráficos, incluyendo la carga y manipulación de los mismos.
 
-    private configManager configManager;
+    private configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
 
-    private static boolean consoleOpen = false; // Variable para rastrear si la ventana de la consola está abierta
+    private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
 
-    private int currentIndex = 1;
-    private Timeline animationTimeline;
+    private int currentFrameIndex = 1; // Índice del frame actual en la animación.
 
-    private double orgSceneX, orgSceneY;
-    private double orgTranslateX, orgTranslateY;
+    private Timeline animationTimeline; // Línea de tiempo que controla la animación de los frames en el visor.
+
+    private double orgSceneX, orgSceneY; // Coordenadas originales del cursor del mouse en la escena al presionar el botón del mouse.
+
+    private double orgTranslateX, orgTranslateY; // Valores de traducción originales del ImageView al arrastrar el mouse.
 
     /**
      * Método de inicialización del controlador. Carga los datos de gráficos y configura el ListView.
@@ -293,7 +293,7 @@ public class frmMain {
                 new KeyFrame(Duration.ZERO, event -> {
                     // Actualizar la imagen en el ImageView con el frame actual
                     updateFrame(selectedGrh);
-                    currentIndex = (currentIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
+                    currentFrameIndex = (currentFrameIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
                 }),
                 new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
         );
@@ -310,8 +310,8 @@ public class frmMain {
     private void updateFrame(grhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
-        if (currentIndex > 0 && currentIndex < frames.length) {
-            grhData currentGrh = grhList.get(frames[currentIndex]);
+        if (currentFrameIndex > 0 && currentFrameIndex< frames.length) {
+            grhData currentGrh = grhList.get(frames[currentFrameIndex]);
 
             String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
 
