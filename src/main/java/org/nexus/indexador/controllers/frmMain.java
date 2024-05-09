@@ -30,6 +30,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class frmMain {
@@ -112,6 +113,7 @@ public class frmMain {
     /**
      * Carga los datos de gráficos desde archivos binarios y actualiza la interfaz de usuario con la información obtenida.
      * Muestra los índices de gráficos en el ListView y actualiza los textos de los labels con información relevante.
+     *
      * @throws IOException Sí ocurre un error durante la lectura de los archivos binarios.
      */
     private void loadGrhData() {
@@ -170,6 +172,7 @@ public class frmMain {
     /**
      * Actualiza el editor con la información del gráfico seleccionado.
      * Muestra los detalles del gráfico seleccionado en los campos de texto correspondientes.
+     *
      * @param selectedGrh El gráfico seleccionado.
      */
     private void updateEditor(grhData selectedGrh) {
@@ -220,6 +223,7 @@ public class frmMain {
     /**
      * Actualiza el visor con el gráfico seleccionado.
      * Si el gráfico es estático, muestra la imagen estática correspondiente. Si es una animación, muestra la animación.
+     *
      * @param selectedGrh El gráfico seleccionado.
      */
     private void updateViewer(grhData selectedGrh) {
@@ -281,7 +285,7 @@ public class frmMain {
      * La animación se ejecuta en un bucle infinito hasta que se detenga explícitamente.
      *
      * @param selectedGrh El gráfico seleccionado.
-     * @param nFrames El número total de fotogramas en la animación.
+     * @param nFrames     El número total de fotogramas en la animación.
      */
     private void displayAnimation(grhData selectedGrh, int nFrames) {
         // Configurar la animación
@@ -310,7 +314,7 @@ public class frmMain {
     private void updateFrame(grhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
-        if (currentFrameIndex > 0 && currentFrameIndex< frames.length) {
+        if (currentFrameIndex > 0 && currentFrameIndex < frames.length) {
             grhData currentGrh = grhList.get(frames[currentFrameIndex]);
 
             String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
@@ -340,7 +344,7 @@ public class frmMain {
     /**
      * Dibuja la imagen completa del gráfico en el ImageView y dibuja un rectángulo alrededor de la región del índice.
      *
-     * @param grhImage La imagen completa del gráfico.
+     * @param grhImage    La imagen completa del gráfico.
      * @param selectedGrh El gráfico seleccionado que contiene la información de la región del índice.
      */
     private void drawFullImage(Image grhImage, grhData selectedGrh) {
@@ -353,6 +357,7 @@ public class frmMain {
 
     /**
      * Dibuja un rectángulo alrededor de la región específica del gráfico en el ImageView.
+     *
      * @param selectedGrh El gráfico seleccionado.
      */
     private void drawRectangle(grhData selectedGrh) {
@@ -523,6 +528,7 @@ public class frmMain {
 
     /**
      * Filtra los índices en el ListView según el texto proporcionado.
+     *
      * @param filterText El texto utilizado para filtrar los índices.
      */
     private void filterIndices(String filterText) {
@@ -580,8 +586,8 @@ public class frmMain {
         if (event.isSecondaryButtonDown()) {
             orgSceneX = event.getSceneX();
             orgSceneY = event.getSceneY();
-            orgTranslateX = ((ImageView)(event.getSource())).getTranslateX();
-            orgTranslateY = ((ImageView)(event.getSource())).getTranslateY();
+            orgTranslateX = ((ImageView) (event.getSource())).getTranslateX();
+            orgTranslateY = ((ImageView) (event.getSource())).getTranslateY();
         }
     }
 
@@ -601,8 +607,8 @@ public class frmMain {
             double newTranslateX = orgTranslateX + offsetX;
             double newTranslateY = orgTranslateY + offsetY;
 
-            ((ImageView)(event.getSource())).setTranslateX(newTranslateX);
-            ((ImageView)(event.getSource())).setTranslateY(newTranslateY);
+            ((ImageView) (event.getSource())).setTranslateX(newTranslateX);
+            ((ImageView) (event.getSource())).setTranslateY(newTranslateY);
         }
     }
 
@@ -713,6 +719,55 @@ public class frmMain {
 
     @FXML
     private void btnAddFrame_OnAction() {
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Introduce el numero del indice");
+        dialog.setHeaderText("Por favor, introduce un Grh:");
+        dialog.setContentText("Grh:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                int numero = Integer.parseInt(result.get());
+
+                // Obtenemos el índice seleccionado en la lista de indices:
+                int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+                if (selectedIndex >= 0) {
+
+                    // Solo podemos añadir los indices estáticos
+                    if (grhList.get(numero).getNumFrames() == 1) {
+
+                        grhList.get(selectedIndex).setNumFrames((short) (grhList.get(selectedIndex).getNumFrames() + 1));
+
+                        int[] frames = grhList.get(selectedIndex).getFrames();
+
+                        int[] newFrames = Arrays.copyOf(frames, frames.length + 1);
+                        newFrames[frames.length] = numero;
+
+                        // Establecer el nuevo array utilizando el método setFrames(), si está disponible
+                        grhList.get(selectedIndex).setFrames(newFrames);
+
+                        updateEditor(grhList.get(selectedIndex));
+
+
+                    } else {
+                        System.out.println("El indice seleccionado no es valido.");
+
+                    }
+
+                } else {
+                    System.out.println("Indice invalido. Solo se aceptan indices desde el 1 hasta el " + grhDataManager.getGrhCount());
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Entrada inválida. Introduce un número válido.");
+
+            }
+
+        } else {
+            System.out.println("Operación cancelada.");
+        }
 
     }
 
