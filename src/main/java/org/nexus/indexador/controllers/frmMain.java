@@ -89,6 +89,8 @@ public class frmMain {
 
     private configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
 
+    private byteMigration byteMigration;
+
     private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
 
     private int currentFrameIndex = 1; // Índice del frame actual en la animación.
@@ -104,6 +106,13 @@ public class frmMain {
      */
     @FXML
     protected void initialize() {
+
+        // Obtener instancias de configManager y byteMigration
+        configManager = org.nexus.indexador.utils.configManager.getInstance();
+        byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+
+        grhDataManager = new grhData(); // Crear una instancia de grhData
+
         loadGrhData();
         setupGrhListListener();
         setupFilterTextFieldListener();
@@ -117,8 +126,6 @@ public class frmMain {
      * @throws IOException Sí ocurre un error durante la lectura de los archivos binarios.
      */
     private void loadGrhData() {
-        grhDataManager = new grhData(); // Crear una instancia de grhData
-        configManager = org.nexus.indexador.utils.configManager.getInstance(); // Inicializar configManager
 
         try {
             // Llamar al método para leer el archivo binario y obtener la lista de grhData
@@ -417,8 +424,6 @@ public class frmMain {
     @FXML
     private void mnuExportGrh() {
 
-        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-
         File file = new File(configManager.getExportDir() + "graficos.ini");
 
         System.out.println("Exportando indices, espera...");
@@ -667,9 +672,6 @@ public class frmMain {
      */
     @FXML
     private void mnuIndexbyMemory() throws IOException {
-        // Obtener instancias de configManager y byteMigration
-        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
         // Crear un objeto File para el archivo donde se guardarán los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "Graficos.ind");
@@ -773,6 +775,59 @@ public class frmMain {
 
     @FXML
     private void btnRemoveFrame_OnAction() {
+        // Obtenemos el índice del frame seleccionado en la lista lstFrames
+        int selectedFrameIndex = lstFrames.getSelectionModel().getSelectedIndex() + 1;
 
+        // Verificamos si se ha seleccionado un frame
+        if (selectedFrameIndex != -1) {
+            // Creamos un diálogo de confirmación
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmación");
+            alert.setHeaderText("¿Estás seguro de que quieres eliminar este elemento?");
+            alert.setContentText("Esta acción no se puede deshacer.");
+
+            // Mostramos el diálogo y esperamos la respuesta del usuario
+            Optional<ButtonType> result = alert.showAndWait();
+
+            // Verificamos si el usuario ha confirmado la eliminación
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Obtenemos el índice seleccionado en la lista de índices
+                int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+                // Verificamos si se ha seleccionado un índice
+                if (selectedIndex >= 0) {
+                    // Obtenemos el objeto grhData seleccionado en la lista de índices
+                    grhData selectedGrh = grhList.get(selectedIndex);
+
+                    // Obtenemos los frames actuales del objeto grhData
+                    int[] frames = selectedGrh.getFrames();
+
+                    // Creamos un nuevo array para almacenar los frames sin el frame seleccionado
+                    int[] newFrames = new int[frames.length - 1];
+                    int newIndex = 0;
+
+                    // Copiamos los frames al nuevo array, omitiendo el frame seleccionado
+                    for (int i = 0; i < frames.length; i++) {
+                        if (i != selectedFrameIndex) {
+                            newFrames[newIndex] = frames[i];
+                            newIndex++;
+                        }
+                    }
+
+                    // Actualizamos el array de frames del objeto grhData
+                    selectedGrh.setFrames(newFrames);
+
+                    // Disminuimos el número de frames en el objeto grhData
+                    selectedGrh.setNumFrames((short) (selectedGrh.getNumFrames() - 1));
+
+                    // Actualizamos el editor con el objeto grhData modificado
+                    updateEditor(selectedGrh);
+                } else {
+                    System.out.println("No se ha seleccionado ningún grhData.");
+                }
+            }
+        } else {
+            System.out.println("No se ha seleccionado ningún frame.");
+        }
     }
 }
