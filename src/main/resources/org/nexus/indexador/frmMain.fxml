@@ -25,7 +25,7 @@
                     <items>
                   <Menu mnemonicParsing="false" text="Exportar">
                     <items>
-                        <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh" text="Indices" />
+                        <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh_OnAction" text="Indices" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Indexar">
@@ -37,7 +37,7 @@
                         </Menu>
                     </items>
                   </Menu>
-                        <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose" text="Cerrar" />
+                        <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose_OnAction" text="Cerrar" />
                     </items>
                 </Menu>
                 <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
@@ -47,12 +47,17 @@
                 </Menu>
                 <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
                     <items>
-                        <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#mnuConsola" text="Consola" />
+                        <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#mnuConsola_OnAction" text="Consola" />
                     </items>
                 </Menu>
+            <Menu mnemonicParsing="false" text="Herramientas">
+              <items>
+                <MenuItem id="mnuGrhAdapter" fx:id="mnuGrhAdapter" mnemonicParsing="false" onAction="#mnuGrhAdapter_OnAction" text="Adaptador de Grh" />
+              </items>
+            </Menu>
                 <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
                     <items>
-                        <MenuItem fx:id="mnuCode" mnemonicParsing="false" onAction="#mnuCode" text="Codigo Fuente" />
+                        <MenuItem fx:id="mnuCode" mnemonicParsing="false" onAction="#mnuCode_OnAction" text="Codigo Fuente" />
                     </items>
                 </Menu>
             </menus>

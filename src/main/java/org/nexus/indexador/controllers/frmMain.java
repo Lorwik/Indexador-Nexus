@@ -389,7 +389,7 @@ public class frmMain {
      * Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
      */
     @FXML
-    private void mnuConsola() {
+    private void mnuConsola_OnAction() {
         if (!consoleOpen) {
             // Crea la nueva ventana
             Stage consoleStage = new Stage();
@@ -422,7 +422,7 @@ public class frmMain {
      * Si se produce algún error durante el proceso de exportación, se imprime un mensaje de error.
      */
     @FXML
-    private void mnuExportGrh() {
+    private void mnuExportGrh_OnAction() {
 
         File file = new File(configManager.getExportDir() + "graficos.ini");
 
@@ -471,12 +471,12 @@ public class frmMain {
      * Cierra la aplicación
      */
     @FXML
-    private void mnuClose() {
+    private void mnuClose_OnAction() {
         Platform.exit();
     }
 
     @FXML
-    private void mnuCode() {
+    private void mnuCode_OnAction() {
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -491,6 +491,25 @@ public class frmMain {
         } else {
             System.out.println("La funcionalidad de escritorio no es compatible.");
         }
+    }
+
+    @FXML
+    private void mnuGrhAdapter_OnAction() {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Adaptador de Grh");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmAdaptador.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
     }
 
     /**
