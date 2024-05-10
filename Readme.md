@@ -6,7 +6,7 @@ Indexador para Argentum Online programado en Java. Actualmente trabaja con recur
 
 ![image](https://github.com/Lorwik/Indexador-Nexus/assets/1338437/ea753277-4461-4e4e-a67d-8397823a2500)
 
-![image](https://github.com/Lorwik/Indexador-Nexus/assets/1338437/d70cc765-fc39-444e-818a-b5f5216f1b43)
+![Captura de pantalla 2024-05-10 210804](https://github.com/Lorwik/Indexador-Nexus/assets/1338437/05fb4355-b4eb-48fb-81a1-d97ddff02761)
 
 ## Estado del Proyecto
 
