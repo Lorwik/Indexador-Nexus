@@ -7,6 +7,9 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +38,42 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class frmMain {
+
+    @FXML
+    public MenuItem mnuShield;
+
+    @FXML
+    public Menu mnuVer;
+
+    @FXML
+    public MenuItem mnuHead;
+
+    @FXML
+    public MenuItem mnuHelmet;
+
+    @FXML
+    public MenuItem mnuBody;
+
+    @FXML
+    public MenuItem mnuFXs;
+
+    @FXML
+    public MenuItem mnuConsola;
+
+    @FXML
+    public MenuItem mnuGrhAdapter;
+
+    @FXML
+    public MenuItem mnuAsistente;
+
+    @FXML
+    public MenuItem mnuCode;
+
+    @FXML
+    public Label lblIndice;
+
+    @FXML
+    public ScrollPane PaneGrhView;
 
     @FXML
     private ListView<String> lstIndices;
