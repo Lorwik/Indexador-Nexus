@@ -17,9 +17,9 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane fx:id="paneMain" maxHeight="649.0" maxWidth="1516.0" minHeight="617.0" minWidth="1064.0" prefHeight="649.0" prefWidth="1065.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
+<AnchorPane fx:id="paneMain" maxHeight="649.0" maxWidth="1516.0" minHeight="768.0" minWidth="1366.0" prefHeight="649.0" prefWidth="1065.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmMain">
     <children>
-        <MenuBar fx:id="MnuBar" prefHeight="25.0" prefWidth="1065.0" style="-fx-background-color: #999999;">
+        <MenuBar fx:id="MnuBar" prefHeight="25.0" prefWidth="1366.0" style="-fx-background-color: #999999;">
             <menus>
                 <Menu fx:id="mnuFile" mnemonicParsing="false" text="Archivo">
                     <items>
@@ -71,31 +71,31 @@
             <DropShadow />
          </effect>
         </MenuBar>
-        <Label fx:id="lblIndices" layoutX="679.0" layoutY="41.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Indices cargados: 0" textFill="WHITE" />
-        <ListView fx:id="lstIndices" layoutX="12.0" layoutY="41.0" prefHeight="526.0" prefWidth="200.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
-        <Label fx:id="lblVersion" layoutX="899.0" layoutY="41.0" prefHeight="17.0" prefWidth="156.0" style="-fx-background-color: #424242;" text="Versión: 0" textFill="WHITE" />
-        <Label fx:id="lblIndice" layoutX="679.0" layoutY="576.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
-        <TextField fx:id="txtIndice" editable="false" layoutX="736.0" layoutY="574.0" prefHeight="25.0" prefWidth="309.0" />
+        <Label fx:id="lblIndices" layoutX="836.0" layoutY="41.0" prefWidth="200.0" style="-fx-background-color: #424242;" text="Indices cargados: 0" textFill="WHITE" />
+        <ListView fx:id="lstIndices" layoutX="12.0" layoutY="41.0" prefHeight="644.0" prefWidth="200.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
+        <Label fx:id="lblVersion" layoutX="1056.0" layoutY="41.0" prefHeight="17.0" prefWidth="156.0" style="-fx-background-color: #424242;" text="Versión: 0" textFill="WHITE" />
+        <Label fx:id="lblIndice" layoutX="843.0" layoutY="688.0" prefWidth="52.0" style="-fx-background-color: #424242;" text="Indice:" textFill="WHITE" />
+        <TextField fx:id="txtIndice" editable="false" layoutX="884.0" layoutY="684.0" prefHeight="25.0" prefWidth="462.0" />
 
-        <ScrollPane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="526.0" prefWidth="446.0" style="-fx-background-color: #000000;">
+        <ScrollPane fx:id="PaneGrhView" layoutX="221.0" layoutY="41.0" prefHeight="644.0" prefWidth="604.0" style="-fx-background-color: #000000;">
             <content>
                 <ImageView fx:id="imgIndice" layoutX="5.0" layoutY="5.0" onMouseDragged="#onMouseDragged" onMousePressed="#onMousePressed" pickOnBounds="true" preserveRatio="true" smooth="true" />
             </content>
         </ScrollPane>
 
-        <Pane layoutX="674.0" layoutY="67.0" prefHeight="282.0" prefWidth="376.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+        <Pane layoutX="836.0" layoutY="67.0" prefHeight="386.0" prefWidth="520.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
             <children>
-                <ImageView fx:id="imgGrafico" fitHeight="270.0" fitWidth="368.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="false" />
+                <ImageView fx:id="imgGrafico" fitHeight="374.0" fitWidth="508.0" layoutX="5.0" layoutY="6.0" pickOnBounds="true" preserveRatio="false" />
                 <Rectangle fx:id="rectanguloIndice" fill="TRANSPARENT" stroke="RED" strokeWidth="1.0" />
             </children>
         </Pane>
 
-      <Button fx:id="btnAplicar" layoutX="678.0" layoutY="608.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar cambios" textAlignment="CENTER" />
-      <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="574.0" prefHeight="25.0" prefWidth="200.0" promptText="Buscar por índice" />
-      <Slider fx:id="sldZoom" layoutX="221.0" layoutY="568.0" max="50.0" min="1.0" prefHeight="66.0" prefWidth="446.0" value="1.0" />
-      <Button fx:id="btnAdd" layoutX="108.0" layoutY="608.0" mnemonicParsing="false" onAction="#btnAdd_OnAction" prefHeight="25.0" prefWidth="104.0" text="Nuevo" />
-      <Button fx:id="btnDelete" layoutX="14.0" layoutY="608.0" mnemonicParsing="false" onAction="#btnDelete_OnAction" prefHeight="25.0" prefWidth="92.0" text="Remover" />
-      <TabPane layoutX="679.0" layoutY="355.0" prefHeight="210.0" prefWidth="368.0" tabClosingPolicy="UNAVAILABLE">
+      <Button fx:id="btnAplicar" layoutX="910.0" layoutY="721.0" mnemonicParsing="false" onAction="#saveGrhData" prefHeight="25.0" prefWidth="368.0" text="Aplicar cambios" textAlignment="CENTER" />
+      <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="692.0" prefHeight="25.0" prefWidth="200.0" promptText="Buscar por índice" />
+      <Slider fx:id="sldZoom" layoutX="231.0" layoutY="688.0" max="50.0" min="1.0" prefHeight="66.0" prefWidth="586.0" value="1.0" />
+      <Button fx:id="btnAdd" layoutX="108.0" layoutY="726.0" mnemonicParsing="false" onAction="#btnAdd_OnAction" prefHeight="25.0" prefWidth="104.0" text="Nuevo" />
+      <Button fx:id="btnDelete" layoutX="14.0" layoutY="726.0" mnemonicParsing="false" onAction="#btnDelete_OnAction" prefHeight="25.0" prefWidth="92.0" text="Remover" />
+      <TabPane layoutX="837.0" layoutY="463.0" prefHeight="210.0" prefWidth="514.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="Estatico">
             <content>

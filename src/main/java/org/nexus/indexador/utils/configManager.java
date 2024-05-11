@@ -1,8 +1,6 @@
 package org.nexus.indexador.utils;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class configManager {
 
@@ -13,7 +11,8 @@ public class configManager {
     private String initDir;
     private String exportDir;
 
-    private static final String CONFIG_FILE_PATH = "src/main/resources/config.ini";
+    private static final String CONFIG_FILE_NAME = "config.ini";
+    private static final String CONFIG_FILE_PATH = Thread.currentThread().getContextClassLoader().getResource(CONFIG_FILE_NAME).getPath();
 
     public configManager() {}
 
@@ -34,7 +33,6 @@ public class configManager {
     public void setInitDir(String initDir) { this.initDir = initDir; }
     public void setExportDir(String exportDir) { this.exportDir = exportDir; }
 
-
     public void readConfig() throws IOException {
         File configFile = new File(CONFIG_FILE_PATH);
         if (configFile.exists()) {
@@ -48,16 +46,21 @@ public class configManager {
 
                         if (key.equals("Graficos")) {
                             graphicsDir = value;
-
                         } else if (key.equals("Init")) {
                             initDir = value;
-
                         } else if (key.equals("Exportados")) {
                             exportDir = value;
                         }
                     }
                 }
+            } catch (IOException e) {
+                // Manejar la excepción de lectura del archivo
+                System.err.println("Error al leer el archivo de configuración: " + e.getMessage());
+                throw e; // Lanzar la excepción para que sea manejada en otro lugar si es necesario
             }
+        } else {
+            // Manejar el caso en el que el archivo de configuración no existe
+            System.err.println("El archivo de configuración no existe: " + CONFIG_FILE_PATH);
         }
     }
 
