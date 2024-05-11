@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -736,6 +737,27 @@ public class frmMain {
             System.out.println(e.getMessage());
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
+    }
+
+    public void mnuIndexbyExported(ActionEvent actionEvent) {
+    }
+
+    public void mnuHead_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuHelmet_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuBody_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuShield_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuFXs_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuAsistente_OnAction(ActionEvent actionEvent) {
     }
 
     @FXML
