@@ -32,27 +32,33 @@
                     <items>
                         <Menu mnemonicParsing="false" text="Memoria...">
                           <items>
-                            <MenuItem fx:id="mnuIndexbyMemory" mnemonicParsing="false" onAction="#mnuIndexbyMemory" text="Indice" />
+                            <MenuItem fx:id="mnuIndexbyMemory" mnemonicParsing="false" onAction="#mnuIndexbyMemory" text="Indices" />
                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Exportados">
+                           <items>
+                              <MenuItem fx:id="mnuIndexbyExported" mnemonicParsing="false" onAction="#mnuIndexbyExported" text="Indices" />
+                           </items>
                         </Menu>
                     </items>
                   </Menu>
                         <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#mnuClose_OnAction" text="Cerrar" />
                     </items>
                 </Menu>
-                <Menu fx:id="mnuEdit" mnemonicParsing="false" text="Edicion">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                    </items>
-                </Menu>
                 <Menu fx:id="mnuVer" mnemonicParsing="false" text="Ver..">
                     <items>
+                  <MenuItem fx:id="mnuHead" mnemonicParsing="false" onAction="#mnuHead_OnAction" text="Cabezas" />
+                  <MenuItem fx:id="mnuHelmet" mnemonicParsing="false" onAction="#mnuHelmet_OnAction" text="Cascos" />
+                  <MenuItem fx:id="mnuBody" mnemonicParsing="false" onAction="#mnuBody_OnAction" text="Cuerpos" />
+                  <MenuItem fx:id="mnuShield" mnemonicParsing="false" onAction="#mnuShield_OnAction" text="Escudos" />
+                  <MenuItem fx:id="mnuFXs" mnemonicParsing="false" onAction="#mnuFXs_OnAction" text="FX's" />
                         <MenuItem fx:id="mnuConsola" mnemonicParsing="false" onAction="#mnuConsola_OnAction" text="Consola" />
                     </items>
                 </Menu>
             <Menu mnemonicParsing="false" text="Herramientas">
               <items>
                 <MenuItem id="mnuGrhAdapter" fx:id="mnuGrhAdapter" mnemonicParsing="false" onAction="#mnuGrhAdapter_OnAction" text="Adaptador de Grh" />
+                  <MenuItem id="mnuGrhAdapter" fx:id="mnuAsistente" mnemonicParsing="false" onAction="#mnuAsistente_OnAction" text="Asistente" />
               </items>
             </Menu>
                 <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
