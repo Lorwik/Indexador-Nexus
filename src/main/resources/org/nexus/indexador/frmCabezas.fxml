@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="364.0" prefWidth="528.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmCabezas">
+   <children>
+      <ListView fx:id="lstHeads" layoutX="14.0" layoutY="14.0" prefHeight="334.0" prefWidth="176.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
+      <Pane layoutX="238.0" layoutY="113.0" prefHeight="82.0" prefWidth="80.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+         <children>
+            <ImageView fx:id="imgOeste" fitHeight="70.0" fitWidth="70.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+      <Pane layoutX="324.0" layoutY="64.0" prefHeight="82.0" prefWidth="80.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+         <children>
+            <ImageView fx:id="imgNorte" fitHeight="70.0" fitWidth="70.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+      <Pane layoutX="410.0" layoutY="113.0" prefHeight="82.0" prefWidth="80.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+         <children>
+            <ImageView fx:id="imgEste" fitHeight="70.0" fitWidth="70.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+      <Pane layoutX="324.0" layoutY="154.0" prefHeight="82.0" prefWidth="80.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
+         <children>
+            <ImageView fx:id="imgSur" fitHeight="70.0" fitWidth="70.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+      <Label layoutX="209.0" layoutY="263.0" text="Nº Grafico:" textFill="WHITE" />
+      <Label layoutX="209.0" layoutY="291.0" text="Start X:" textFill="WHITE" />
+      <Label layoutX="209.0" layoutY="319.0" text="Start Y:" textFill="WHITE" />
+      <TextField fx:id="txtNGrafico" layoutX="277.0" layoutY="259.0" prefHeight="25.0" prefWidth="211.0" />
+      <TextField fx:id="txtStartX" layoutX="277.0" layoutY="287.0" prefHeight="25.0" prefWidth="211.0" />
+      <TextField fx:id="txtStartY" layoutX="277.0" layoutY="315.0" prefHeight="25.0" prefWidth="211.0" />
+      <Label fx:id="lblNCabezas" layoutX="211.0" layoutY="14.0" text="Cabezas cargadas: 0" textFill="WHITE" />
+   </children>
+</AnchorPane>

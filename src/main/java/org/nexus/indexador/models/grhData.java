@@ -93,7 +93,7 @@ public class grhData {
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
         // Creamos un objeto File para el archivo que contiene los datos de los gráficos
-        File archivo = new File(configManager.getInitDir() + "Graficos.ind");
+        File archivo = new File(configManager.getInitDir() + "graficos.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
             System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());

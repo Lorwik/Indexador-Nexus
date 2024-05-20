@@ -132,6 +132,7 @@ public class frmMain {
     private byteMigration byteMigration;
 
     private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
+    private static boolean headsOpen = false;
 
     private int currentFrameIndex = 1; // Índice del frame actual en la animación.
 
@@ -535,21 +536,21 @@ public class frmMain {
 
     @FXML
     private void mnuGrhAdapter_OnAction() {
-            // Crea la nueva ventana
-            Stage consoleStage = new Stage();
-            consoleStage.setTitle("Adaptador de Grh");
+        // Crea la nueva ventana
+        Stage consoleStage = new Stage();
+        consoleStage.setTitle("Adaptador de Grh");
 
-            // Lee el archivo FXML para la ventana
-            try {
-                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmAdaptador.fxml"));
-                consoleStage.setScene(new Scene(consoleRoot));
-                consoleStage.setResizable(false);
-                consoleStage.show();
+        // Lee el archivo FXML para la ventana
+        try {
+            Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmAdaptador.fxml"));
+            consoleStage.setScene(new Scene(consoleRoot));
+            consoleStage.setResizable(false);
+            consoleStage.show();
 
-            } catch (Exception e) {
-                e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-            }
+        }
     }
 
     /**
@@ -782,6 +783,30 @@ public class frmMain {
     }
 
     public void mnuHead_OnAction(ActionEvent actionEvent) {
+        if (!headsOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Cabezas");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmCabezas.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                headsOpen = true; // Actualiza el estado para indicar que la ventana de la consola está abierta
+
+                // Listener para detectar cuándo se cierra la ventana de la consola
+                consoleStage.setOnCloseRequest(event -> {
+                    headsOpen = false; // Actualiza el estado cuando se cierra la ventana de la consola
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     public void mnuHelmet_OnAction(ActionEvent actionEvent) {

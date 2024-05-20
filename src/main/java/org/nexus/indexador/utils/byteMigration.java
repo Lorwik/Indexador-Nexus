@@ -64,4 +64,19 @@ public class byteMigration {
         buf.order(ByteOrder.LITTLE_ENDIAN);
         return buf.getShort(0);
     }
+
+    /**
+     *
+     * @param bigendian
+     * @return
+     */
+    public byte bigToLittle_Byte(byte bigendian) {
+        ByteBuffer buf = ByteBuffer.allocate(1);
+
+        buf.order(ByteOrder.BIG_ENDIAN);
+        buf.put(bigendian);
+
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        return buf.get(0);
+    }
 }
