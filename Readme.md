@@ -16,7 +16,7 @@ Este proyecto aun se encuentra en desarrollo. Algunas caracteristicas que faltan
 
 - Lectura de Cuerpos, Fxs, Armas y Escudos
 - Importación desde archivo de texto plano
-- Visualización y edición de Cabezas, Cascos, Cuerpos, FXs, Armas y Escudos
+- Visualización y edición de Cuerpos, FXs, Armas y Escudos
 
 ## Contribución
 
