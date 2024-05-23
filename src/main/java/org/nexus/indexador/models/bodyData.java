@@ -7,7 +7,7 @@ import org.nexus.indexador.utils.configManager;
 
 import java.io.*;
 
-public class BodyData {
+public class bodyData {
 
     private int[] Body;
     private short HeadOffsetX;
@@ -15,13 +15,13 @@ public class BodyData {
 
     private static short NumBodys;
 
-    public BodyData(int[] body, short headOffsetX, short headOffsetY) {
+    public bodyData(int[] body, short headOffsetX, short headOffsetY) {
         this.Body = body;
         this.HeadOffsetX = headOffsetX;
         this.HeadOffsetY = headOffsetY;
     }
 
-    public BodyData() {}
+    public bodyData() {}
 
     public int[] getBody() {
         return Body;
@@ -55,9 +55,9 @@ public class BodyData {
         NumBodys = numBodys;
     }
 
-    public ObservableList<BodyData> readBodyFile() throws IOException {
+    public ObservableList<bodyData> readBodyFile() throws IOException {
         configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-        ObservableList<BodyData> BodyList = FXCollections.observableArrayList();
+        ObservableList<bodyData> BodyList = FXCollections.observableArrayList();
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         File archivo = new File(configManager.getInitDir() + "personajes.ind");
 
@@ -73,7 +73,7 @@ public class BodyData {
                 }
                 short headOffsetX = byteMigration.bigToLittle_Short(file.readShort());
                 short headOffsetY = byteMigration.bigToLittle_Short(file.readShort());
-                BodyData data = new BodyData(body, headOffsetX, headOffsetY);
+                bodyData data = new bodyData(body, headOffsetX, headOffsetY);
                 BodyList.add(data);
             }
 
