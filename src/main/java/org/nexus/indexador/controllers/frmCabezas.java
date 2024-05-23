@@ -2,7 +2,9 @@ package org.nexus.indexador.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -12,7 +14,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import org.nexus.indexador.models.grhData;
 import org.nexus.indexador.models.headData;
-import org.nexus.indexador.utils.configManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,14 @@ public class frmCabezas {
     public TextField txtStartY;
     @FXML
     public Label lblNCabezas;
+    @FXML
+    public Button btnSave;
+    @FXML
+    public TextField txtFiltro;
+    @FXML
+    public Button btnAdd;
+    @FXML
+    public Button btnDelete;
 
     private headData headDataManager; // Objeto que gestiona los datos de las cabezas, incluyendo la carga y manipulación de los mismos
     private ObservableList<headData> headList; // Lista observable que contiene los datos de los gráficos indexados.
@@ -167,4 +176,26 @@ public class frmCabezas {
         }
     }
 
+    public void btnSave_OnAction(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    private void btnAdd_OnAction() {
+        int headCount = headDataManager.getNumHeads() + 1;
+
+        // Incrementar el contador de grhDataManager
+        headData.setNumHeads((short) headCount);
+
+        // Crear un nuevo objeto grhData con los valores adecuados
+        headData newHeadData = new headData(1, (short) 0, (short) 0, (short) 0);
+
+        // Agregar el nuevo elemento al ListView
+        lstHeads.getItems().add(String.valueOf(headCount));
+
+        // Agregar el nuevo elemento al grhList
+        headList.add(newHeadData);
+    }
+
+    public void btnDelete_OnAction(ActionEvent actionEvent) {
+    }
 }
