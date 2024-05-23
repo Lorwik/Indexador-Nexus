@@ -133,6 +133,7 @@ public class frmMain {
 
     private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
     private static boolean headsOpen = false;
+    private static boolean helmetsOpen = false;
 
     private int currentFrameIndex = 1; // Índice del frame actual en la animación.
 
@@ -795,11 +796,10 @@ public class frmMain {
                 consoleStage.setResizable(false);
                 consoleStage.show();
 
-                headsOpen = true; // Actualiza el estado para indicar que la ventana de la consola está abierta
+                headsOpen = true;
 
-                // Listener para detectar cuándo se cierra la ventana de la consola
                 consoleStage.setOnCloseRequest(event -> {
-                    headsOpen = false; // Actualiza el estado cuando se cierra la ventana de la consola
+                    headsOpen = false;
                 });
 
             } catch (Exception e) {
@@ -810,6 +810,29 @@ public class frmMain {
     }
 
     public void mnuHelmet_OnAction(ActionEvent actionEvent) {
+        if (!helmetsOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Cascos");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmCascos.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                helmetsOpen = true;
+
+                consoleStage.setOnCloseRequest(event -> {
+                    helmetsOpen = false;
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     public void mnuBody_OnAction(ActionEvent actionEvent) {
