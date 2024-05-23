@@ -1,3 +1,7 @@
+/**
+ * La clase {@code frmCascos} es un controlador para la interfaz gráfica de usuario (GUI) relacionada con los datos de cascos.
+ * Esta clase maneja la interacción del usuario con la interfaz y gestiona la carga, visualización y manipulación de los datos de los cascos.
+ */
 package org.nexus.indexador.controllers;
 
 import javafx.collections.FXCollections;
@@ -42,25 +46,28 @@ public class frmCascos {
     @FXML
     public Button btnDelete;
 
-    private helmetData helmetDataManager; // Objeto que gestiona los datos de las cascos, incluyendo la carga y manipulación de los mismos
+    private helmetData helmetDataManager; // Objeto que gestiona los datos de los cascos, incluyendo la carga y manipulación de los mismos
     private ObservableList<helmetData> helmetList; // Lista observable que contiene los datos de los gráficos indexados.
 
     private org.nexus.indexador.utils.configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
 
+    /**
+     * Inicializa el controlador, cargando la configuración y los datos de los cascos.
+     */
     @FXML
     protected void initialize() {
-
         configManager = org.nexus.indexador.utils.configManager.getInstance();
-
-        helmetDataManager = new helmetData(); // Crear una instancia de grhData
-
+        helmetDataManager = new helmetData(); // Crear una instancia de helmetData
         loadHelmetData();
         setupHelmetListListener();
     }
 
+    /**
+     * Carga los datos de los cascos desde un archivo y los muestra en la interfaz.
+     */
     private void loadHelmetData() {
         try {
-            // Llamar al método para leer el archivo binario y obtener la lista de grhData
+            // Llamar al método para leer el archivo binario y obtener la lista de helmetData
             helmetList = helmetDataManager.readHelmetFile();
 
             // Actualizar el texto de los labels con la información obtenida
@@ -79,6 +86,9 @@ public class frmCascos {
         }
     }
 
+    /**
+     * Configura un listener para el ListView, manejando los eventos de selección de ítems.
+     */
     private void setupHelmetListListener() {
         // Agregar un listener al ListView para capturar los eventos de selección
         lstHelmets.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -87,7 +97,7 @@ public class frmCascos {
             int selectedIndex = lstHelmets.getSelectionModel().getSelectedIndex();
 
             if (selectedIndex >= 0) {
-                // Obtener el objeto grhData correspondiente al índice seleccionado
+                // Obtener el objeto helmetData correspondiente al índice seleccionado
                 helmetData selectedHelmet = helmetList.get(selectedIndex);
                 updateEditor(selectedHelmet);
 
@@ -98,6 +108,11 @@ public class frmCascos {
         });
     }
 
+    /**
+     * Actualiza el editor de la interfaz con los datos del casco seleccionado.
+     *
+     * @param selectedHelmet el objeto helmetData seleccionado.
+     */
     private void updateEditor(helmetData selectedHelmet) {
         // Obtenemos todos los datos
         short Texture = selectedHelmet.getTexture();
@@ -107,9 +122,14 @@ public class frmCascos {
         txtNGrafico.setText(String.valueOf(Texture));
         txtStartX.setText(String.valueOf(StartX));
         txtStartY.setText(String.valueOf(StartY));
-
     }
 
+    /**
+     * Dibuja las imágenes de los cascos en las diferentes vistas (Norte, Sur, Este, Oeste).
+     *
+     * @param selectedHelmet el objeto helmetData seleccionado.
+     * @param helmeting la dirección en la que se debe dibujar el casco (0: Sur, 1: Norte, 2: Oeste, 3: Este).
+     */
     private void drawHelmets(helmetData selectedHelmet, int helmeting) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedHelmet.getTexture() + ".png";
@@ -171,13 +191,18 @@ public class frmCascos {
         }
     }
 
+    /**
+     * Maneja el evento de acción del botón "Guardar". Aplica los cambios al objeto helmetData seleccionado.
+     *
+     * @param actionEvent el evento de acción del botón.
+     */
     public void btnSave_OnAction(ActionEvent actionEvent) {
         // Obtenemos el índice seleccionado en la lista:
         int selectedHelmetIndex = lstHelmets.getSelectionModel().getSelectedIndex();
 
         // Nos aseguramos de que el índice es válido
         if (selectedHelmetIndex >= 0) {
-            // Obtenemos el objeto grhData correspondiente al índice seleccionado
+            // Obtenemos el objeto helmetData correspondiente al índice seleccionado
             helmetData selectedHelmet = helmetList.get(selectedHelmetIndex);
 
             // Comenzamos aplicar los cambios:
@@ -185,28 +210,35 @@ public class frmCascos {
             selectedHelmet.setStartX(Short.parseShort(txtStartX.getText()));
             selectedHelmet.setStartY(Short.parseShort(txtStartY.getText()));
 
-            System.out.println(("Cambios aplicados!"));
-
+            System.out.println(("¡Cambios aplicados!"));
         }
     }
 
+    /**
+     * Maneja el evento de acción del botón "Agregar". Agrega un nuevo objeto helmetData a la lista.
+     */
     @FXML
     private void btnAdd_OnAction() {
         int helmetCount = helmetDataManager.getNumHelmets() + 1;
 
-        // Incrementar el contador de grhDataManager
+        // Incrementar el contador de helmetDataManager
         helmetData.setNumHelmets((short) helmetCount);
 
-        // Crear un nuevo objeto grhData con los valores adecuados
+        // Crear un nuevo objeto helmetData con los valores adecuados
         helmetData newHelmetData = new helmetData(2, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstHelmets.getItems().add(String.valueOf(helmetCount));
 
-        // Agregar el nuevo elemento al grhList
+        // Agregar el nuevo elemento a helmetList
         helmetList.add(newHelmetData);
     }
 
+    /**
+     * Maneja el evento de acción del botón "Eliminar". Elimina el objeto helmetData seleccionado de la lista.
+     *
+     * @param actionEvent el evento de acción del botón.
+     */
     public void btnDelete_OnAction(ActionEvent actionEvent) {
         int selectedIndex = lstHelmets.getSelectionModel().getSelectedIndex();
 

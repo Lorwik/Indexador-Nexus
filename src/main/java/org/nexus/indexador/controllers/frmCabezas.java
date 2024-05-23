@@ -1,3 +1,7 @@
+/**
+ * La clase {@code frmCabezas} es un controlador para la interfaz gráfica de usuario (GUI) relacionada con los datos de cabezas.
+ * Esta clase maneja la interacción del usuario con la interfaz y gestiona la carga, visualización y manipulación de los datos de las cabezas.
+ */
 package org.nexus.indexador.controllers;
 
 import javafx.collections.FXCollections;
@@ -9,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import org.nexus.indexador.models.grhData;
 import org.nexus.indexador.models.headData;
 
 import java.io.File;
@@ -48,20 +51,23 @@ public class frmCabezas {
 
     private org.nexus.indexador.utils.configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
 
+    /**
+     * Inicializa el controlador, cargando la configuración y los datos de las cabezas.
+     */
     @FXML
     protected void initialize() {
-
         configManager = org.nexus.indexador.utils.configManager.getInstance();
-
-        headDataManager = new headData(); // Crear una instancia de grhData
-
+        headDataManager = new headData(); // Crear una instancia de headData
         loadHeadData();
         setupHeadListListener();
     }
 
+    /**
+     * Carga los datos de las cabezas desde un archivo y los muestra en la interfaz.
+     */
     private void loadHeadData() {
         try {
-            // Llamar al método para leer el archivo binario y obtener la lista de grhData
+            // Llamar al método para leer el archivo binario y obtener la lista de headData
             headList = headDataManager.readHeadFile();
 
             // Actualizar el texto de los labels con la información obtenida
@@ -80,6 +86,9 @@ public class frmCabezas {
         }
     }
 
+    /**
+     * Configura un listener para el ListView, manejando los eventos de selección de ítems.
+     */
     private void setupHeadListListener() {
         // Agregar un listener al ListView para capturar los eventos de selección
         lstHeads.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -88,7 +97,7 @@ public class frmCabezas {
             int selectedIndex = lstHeads.getSelectionModel().getSelectedIndex();
 
             if (selectedIndex >= 0) {
-                // Obtener el objeto grhData correspondiente al índice seleccionado
+                // Obtener el objeto headData correspondiente al índice seleccionado
                 headData selectedHead = headList.get(selectedIndex);
                 updateEditor(selectedHead);
 
@@ -99,6 +108,11 @@ public class frmCabezas {
         });
     }
 
+    /**
+     * Actualiza el editor de la interfaz con los datos de la cabeza seleccionada.
+     *
+     * @param selectedHead el objeto headData seleccionado.
+     */
     private void updateEditor(headData selectedHead) {
         // Obtenemos todos los datos
         short Texture = selectedHead.getTexture();
@@ -108,9 +122,14 @@ public class frmCabezas {
         txtNGrafico.setText(String.valueOf(Texture));
         txtStartX.setText(String.valueOf(StartX));
         txtStartY.setText(String.valueOf(StartY));
-
     }
 
+    /**
+     * Dibuja las imágenes de las cabezas en las diferentes vistas (Norte, Sur, Este, Oeste).
+     *
+     * @param selectedHead el objeto headData seleccionado.
+     * @param heading la dirección en la que se debe dibujar la cabeza (0: Sur, 1: Norte, 2: Oeste, 3: Este).
+     */
     private void drawHeads(headData selectedHead, int heading) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedHead.getTexture() + ".png";
@@ -172,13 +191,18 @@ public class frmCabezas {
         }
     }
 
+    /**
+     * Maneja el evento de acción del botón "Guardar". Aplica los cambios al objeto headData seleccionado.
+     *
+     * @param actionEvent el evento de acción del botón.
+     */
     public void btnSave_OnAction(ActionEvent actionEvent) {
         // Obtenemos el índice seleccionado en la lista:
         int selectedHeadIndex = lstHeads.getSelectionModel().getSelectedIndex();
 
         // Nos aseguramos de que el índice es válido
         if (selectedHeadIndex >= 0) {
-            // Obtenemos el objeto grhData correspondiente al índice seleccionado
+            // Obtenemos el objeto headData correspondiente al índice seleccionado
             headData selectedHead = headList.get(selectedHeadIndex);
 
             // Comenzamos aplicar los cambios:
@@ -186,28 +210,35 @@ public class frmCabezas {
             selectedHead.setStartX(Short.parseShort(txtStartX.getText()));
             selectedHead.setStartY(Short.parseShort(txtStartY.getText()));
 
-            System.out.println(("Cambios aplicados!"));
-
+            System.out.println(("¡Cambios aplicados!"));
         }
     }
 
+    /**
+     * Maneja el evento de acción del botón "Agregar". Agrega un nuevo objeto headData a la lista.
+     */
     @FXML
     private void btnAdd_OnAction() {
         int headCount = headDataManager.getNumHeads() + 1;
 
-        // Incrementar el contador de grhDataManager
+        // Incrementar el contador de headDataManager
         headData.setNumHeads((short) headCount);
 
-        // Crear un nuevo objeto grhData con los valores adecuados
+        // Crear un nuevo objeto headData con los valores adecuados
         headData newHeadData = new headData(1, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstHeads.getItems().add(String.valueOf(headCount));
 
-        // Agregar el nuevo elemento al grhList
+        // Agregar el nuevo elemento a headList
         headList.add(newHeadData);
     }
 
+    /**
+     * Maneja el evento de acción del botón "Eliminar". Elimina el objeto headData seleccionado de la lista.
+     *
+     * @param actionEvent el evento de acción del botón.
+     */
     public void btnDelete_OnAction(ActionEvent actionEvent) {
         int selectedIndex = lstHeads.getSelectionModel().getSelectedIndex();
 

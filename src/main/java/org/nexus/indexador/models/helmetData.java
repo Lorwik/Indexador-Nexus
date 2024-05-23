@@ -1,3 +1,6 @@
+/**
+ * La clase {@code helmetData} maneja los datos de los cascos, incluyendo la carga desde un archivo y la manipulación de dichos datos.
+ */
 package org.nexus.indexador.models;
 
 import javafx.collections.FXCollections;
@@ -16,7 +19,14 @@ public class helmetData {
 
     private static short NumHelmets;
 
-    //Constructor
+    /**
+     * Constructor de la clase {@code helmetData}.
+     *
+     * @param std     el valor estándar del casco.
+     * @param texture la textura del casco.
+     * @param startX  la coordenada X inicial del casco.
+     * @param startY  la coordenada Y inicial del casco.
+     */
     public helmetData(int std, short texture, short startX, short startY) {
         Std = std;
         Texture = texture;
@@ -24,23 +34,31 @@ public class helmetData {
         StartY = startY;
     }
 
-    //Constructor vacio
+    /**
+     * Constructor vacío de la clase {@code helmetData}.
+     */
     public helmetData() {}
 
-    //Metodos SET
+    // Métodos GET
     public int getStd() { return Std; }
     public short getTexture() { return Texture; }
     public short getStartX() { return StartX; }
     public short getStartY() { return StartY; }
     public static short getNumHelmets() { return NumHelmets; }
 
-    //Metodos GET
+    // Métodos SET
     public void setStd(int std) { Std = std; }
     public void setTexture(short texture) { Texture = texture; }
     public void setStartX(short startX) { StartX = startX; }
     public void setStartY(short startY) { StartY = startY; }
     public static void setNumHelmets(short numHelmets) { NumHelmets = numHelmets; }
 
+    /**
+     * Lee los datos de los cascos desde un archivo y los carga en una lista observable.
+     *
+     * @return una lista observable de objetos {@code helmetData} que contiene los datos de los cascos leídos del archivo.
+     * @throws IOException si ocurre un error al leer el archivo.
+     */
     public ObservableList<helmetData> readHelmetFile() throws IOException {
 
         // Obtenemos una instancia de configManager
@@ -58,7 +76,7 @@ public class helmetData {
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
             System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
 
-            //Nos posicionamos al inicio del fichero
+            // Nos posicionamos al inicio del fichero
             file.seek(0);
 
             NumHelmets = byteMigration.bigToLittle_Short(file.readShort());
@@ -75,10 +93,9 @@ public class helmetData {
                 startx = byteMigration.bigToLittle_Short(file.readShort());
                 starty = byteMigration.bigToLittle_Short(file.readShort());
 
-                //Creamos un objeto de HelmetData
-                helmetData helmetData = new helmetData(std,texture,startx,starty);
+                // Creamos un objeto de helmetData
+                helmetData helmetData = new helmetData(std, texture, startx, starty);
                 HelmetList.add(helmetData);
-
             }
 
         } catch (FileNotFoundException e) {
@@ -91,7 +108,6 @@ public class helmetData {
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw e; // Relanzar la excepción para manejarla fuera del método
-
         }
         return HelmetList;
     }
