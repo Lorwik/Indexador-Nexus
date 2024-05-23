@@ -175,6 +175,22 @@ public class frmCabezas {
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
+        // Obtenemos el índice seleccionado en la lista:
+        int selectedHeadIndex = lstHeads.getSelectionModel().getSelectedIndex();
+
+        // Nos aseguramos de que el índice es válido
+        if (selectedHeadIndex >= 0) {
+            // Obtenemos el objeto grhData correspondiente al índice seleccionado
+            headData selectedHead = headList.get(selectedHeadIndex);
+
+            // Comenzamos aplicar los cambios:
+            selectedHead.setTexture(Short.parseShort(txtNGrafico.getText()));
+            selectedHead.setStartX(Short.parseShort(txtStartX.getText()));
+            selectedHead.setStartY(Short.parseShort(txtStartY.getText()));
+
+            System.out.println(("Cambios aplicados!"));
+
+        }
     }
 
     @FXML
