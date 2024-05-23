@@ -14,7 +14,7 @@ Indexador para Argentum Online programado en Java. Actualmente trabaja con recur
 
 Este proyecto aun se encuentra en desarrollo. Algunas caracteristicas que faltan son:
 
-- Lectura de Cabezas, Cascos, Cuerpos, Fxs, Armas y Escudos
+- Lectura de Cuerpos, Fxs, Armas y Escudos
 - Importación desde archivo de texto plano
 - Visualización y edición de Cabezas, Cascos, Cuerpos, FXs, Armas y Escudos
 
