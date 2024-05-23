@@ -10,7 +10,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="364.0" prefWidth="528.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.nexus.indexador.controllers.frmCabezas">
    <children>
-      <ListView fx:id="lstHeads" layoutX="14.0" layoutY="14.0" prefHeight="270.0" prefWidth="176.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
+      <ListView fx:id="lstHeads" layoutX="14.0" layoutY="14.0" prefHeight="308.0" prefWidth="176.0" style="-fx-background-color: #535353; -fx-border-color: #000000;" />
       <Pane layoutX="240.0" layoutY="86.0" prefHeight="82.0" prefWidth="80.0" style="-fx-background-color: #000000; -fx-border-color: #CBCBCB;">
          <children>
             <ImageView fx:id="imgOeste" fitHeight="70.0" fitWidth="70.0" layoutX="5.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
@@ -39,7 +39,6 @@
       <TextField fx:id="txtStartY" layoutX="279.0" layoutY="288.0" prefHeight="25.0" prefWidth="211.0" />
       <Label fx:id="lblNCabezas" layoutX="211.0" layoutY="14.0" text="Cabezas cargadas: 0" textFill="WHITE" />
       <Button fx:id="btnSave" layoutX="211.0" layoutY="328.0" mnemonicParsing="false" onAction="#btnSave_OnAction" prefHeight="25.0" prefWidth="280.0" text="Aplicar cambios" />
-      <TextField fx:id="txtFiltro" layoutX="14.0" layoutY="294.0" prefHeight="25.0" prefWidth="176.0" promptText="Buscar por índice" />
       <Button fx:id="btnAdd" layoutX="102.0" layoutY="328.0" mnemonicParsing="false" onAction="#btnAdd_OnAction" prefHeight="25.0" prefWidth="86.0" text="Nuevo" />
       <Button fx:id="btnDelete" layoutX="14.0" layoutY="328.0" mnemonicParsing="false" onAction="#btnDelete_OnAction" prefHeight="25.0" prefWidth="80.0" text="Remover" />
    </children>

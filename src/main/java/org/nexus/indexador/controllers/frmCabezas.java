@@ -39,8 +39,6 @@ public class frmCabezas {
     @FXML
     public Button btnSave;
     @FXML
-    public TextField txtFiltro;
-    @FXML
     public Button btnAdd;
     @FXML
     public Button btnDelete;
