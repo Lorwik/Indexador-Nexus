@@ -4,10 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -17,6 +14,7 @@ import org.nexus.indexador.models.headData;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class frmCabezas {
 
@@ -197,5 +195,19 @@ public class frmCabezas {
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
+        int selectedIndex = lstHeads.getSelectionModel().getSelectedIndex();
+
+        if (selectedIndex != -1) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmación");
+            alert.setHeaderText("¿Estás seguro de que quieres eliminar este elemento?");
+            alert.setContentText("Esta acción no se puede deshacer.");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                lstHeads.getItems().remove(selectedIndex);
+                headList.remove(selectedIndex);
+            }
+        }
     }
 }
