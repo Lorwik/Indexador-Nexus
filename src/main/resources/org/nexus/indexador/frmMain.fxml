@@ -26,6 +26,8 @@
                   <Menu mnemonicParsing="false" text="Exportar">
                     <items>
                         <MenuItem fx:id="mnuExportGrh" mnemonicParsing="false" onAction="#mnuExportGrh_OnAction" text="Indices" />
+                        <MenuItem fx:id="mnuExportHead" mnemonicParsing="false" onAction="#mnuExportHead_OnAction" text="Cabezas" />
+                        <MenuItem fx:id="mnuExportHelmet" mnemonicParsing="false" onAction="#mnuExportHelmet_OnAction" text="Cascos" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Indexar">

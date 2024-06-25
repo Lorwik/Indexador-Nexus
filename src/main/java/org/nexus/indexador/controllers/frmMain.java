@@ -27,6 +27,7 @@ import org.nexus.indexador.Main;
 import org.nexus.indexador.models.grhData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.nexus.indexador.models.headData;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.configManager;
 
@@ -957,5 +958,11 @@ public class frmMain {
         } else {
             System.out.println("No se ha seleccionado ningún frame.");
         }
+    }
+
+    public void mnuExportHead_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuExportHelmet_OnAction(ActionEvent actionEvent) {
     }
 }
