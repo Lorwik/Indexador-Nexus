@@ -5,12 +5,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.nexus.indexador.Main;
+import org.nexus.indexador.gamedata.DataManager;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.IOException;
 
 public class frmCargando {
+
+    @FXML
+    public Label lblStatus;
 
     private Stage currentStage;
 
@@ -26,15 +32,26 @@ public class frmCargando {
     public void init() {
         // Ejecutar la lectura de configuración y apertura de nueva ventana en un hilo separado
         new Thread(() -> {
-            org.nexus.indexador.utils.configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-
             try {
                 // Simular tiempo de carga
-                Thread.sleep(2000);
+                // Thread.sleep(2000);
 
                 // Lectura de la configuración
+                ConfigManager configManager = ConfigManager.getInstance();
                 configManager.readConfig();
-            } catch (IOException | InterruptedException e) {
+
+                DataManager dataManager = DataManager.getInstance();
+
+                Platform.runLater(() -> lblStatus.setText("Cargando indice de graficos..."));
+                dataManager.loadGrhData();
+
+                Platform.runLater(() -> lblStatus.setText("Cargando indice de cabezas..."));
+                dataManager.readHeadFile();
+
+                Platform.runLater(() -> lblStatus.setText("Cargando indice de cascos..."));
+                dataManager.readHelmetFile();
+
+            } catch (IOException e) {
                 System.err.println("Error al leer la configuración: " + e.getMessage());
             }
 

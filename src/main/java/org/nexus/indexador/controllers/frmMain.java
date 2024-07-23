@@ -24,12 +24,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.nexus.indexador.Main;
-import org.nexus.indexador.models.grhData;
+import org.nexus.indexador.gamedata.DataManager;
+import org.nexus.indexador.gamedata.models.GrhData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.nexus.indexador.models.headData;
 import org.nexus.indexador.utils.byteMigration;
-import org.nexus.indexador.utils.configManager;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.awt.*;
 import java.io.*;
@@ -124,13 +124,13 @@ public class frmMain {
     @FXML
     private Slider sldZoom;
 
-    private ObservableList<grhData> grhList; // Lista observable que contiene los datos de los gráficos indexados.
+    private ObservableList<GrhData> grhList; // Lista observable que contiene los datos de los gráficos indexados.
 
-    private grhData grhDataManager; // Objeto que gestiona los datos de los gráficos, incluyendo la carga y manipulación de los mismos.
-
-    private configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private ConfigManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
 
     private byteMigration byteMigration;
+
+    private DataManager dataManager;
 
     private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
     private static boolean headsOpen = false;
@@ -148,15 +148,14 @@ public class frmMain {
      * Método de inicialización del controlador. Carga los datos de gráficos y configura el ListView.
      */
     @FXML
-    protected void initialize() {
+    protected void initialize() throws IOException {
 
         // Obtener instancias de configManager y byteMigration
-        configManager = org.nexus.indexador.utils.configManager.getInstance();
+        configManager = ConfigManager.getInstance();
         byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+        dataManager = org.nexus.indexador.gamedata.DataManager.getInstance();
 
-        grhDataManager = new grhData(); // Crear una instancia de grhData
-
-        loadGrhData();
+        loadGrh();
         setupGrhListListener();
         setupFilterTextFieldListener();
         setupSliderZoom();
@@ -168,30 +167,26 @@ public class frmMain {
      *
      * @throws IOException Sí ocurre un error durante la lectura de los archivos binarios.
      */
-    private void loadGrhData() {
+    private void loadGrh() {
 
-        try {
-            // Llamar al método para leer el archivo binario y obtener la lista de grhData
-            grhList = grhDataManager.readGrhFile();
+        // Llamar al método para leer el archivo binario y obtener la lista de grhData
+        grhList = dataManager.getGrhList();
 
-            // Actualizar el texto de los labels con la información obtenida
-            lblIndices.setText("Indices cargados: " + grhDataManager.getGrhCount());
-            lblVersion.setText("Versión de Indices: " + grhDataManager.getVersion());
+        // Actualizar el texto de los labels con la información obtenida
+        lblIndices.setText("Indices cargados: " + dataManager.getGrhCount());
+        lblVersion.setText("Versión de Indices: " + dataManager.getGrhVersion());
 
-            // Agregar los índices de gráficos al ListView
-            ObservableList<String> grhIndices = FXCollections.observableArrayList();
-            for (grhData grh : grhList) {
-                String indice = String.valueOf(grh.getGrh());
-                if (grh.getNumFrames() > 1) {
-                    indice += " (Animación)"; // Agregar indicación de animación
-                }
-                grhIndices.add(indice);
+        // Agregar los índices de gráficos al ListView
+        ObservableList<String> grhIndices = FXCollections.observableArrayList();
+        for (GrhData grh : grhList) {
+            String indice = String.valueOf(grh.getGrh());
+            if (grh.getNumFrames() > 1) {
+                indice += " (Animación)"; // Agregar indicación de animación
             }
-            lstIndices.setItems(grhIndices);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            grhIndices.add(indice);
         }
+        lstIndices.setItems(grhIndices);
+
     }
 
     /**
@@ -212,7 +207,7 @@ public class frmMain {
 
             if (selectedIndex >= 0) {
                 // Obtener el objeto grhData correspondiente al índice seleccionado
-                grhData selectedGrh = grhList.get(selectedIndex);
+                GrhData selectedGrh = grhList.get(selectedIndex);
                 updateEditor(selectedGrh);
                 updateViewer(selectedGrh);
             }
@@ -225,7 +220,7 @@ public class frmMain {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void updateEditor(grhData selectedGrh) {
+    private void updateEditor(GrhData selectedGrh) {
         // Obtenemos todos los datos
         int fileGrh = selectedGrh.getFileNum();
         int nFrames = selectedGrh.getNumFrames();
@@ -276,7 +271,7 @@ public class frmMain {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void updateViewer(grhData selectedGrh) {
+    private void updateViewer(GrhData selectedGrh) {
         int nFrames = selectedGrh.getNumFrames();
         if (nFrames == 1) {
             displayStaticImage(selectedGrh);
@@ -294,7 +289,7 @@ public class frmMain {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void displayStaticImage(grhData selectedGrh) {
+    private void displayStaticImage(GrhData selectedGrh) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
         File imageFile = new File(imagePath);
@@ -337,7 +332,7 @@ public class frmMain {
      * @param selectedGrh El gráfico seleccionado.
      * @param nFrames     El número total de fotogramas en la animación.
      */
-    private void displayAnimation(grhData selectedGrh, int nFrames) {
+    private void displayAnimation(GrhData selectedGrh, int nFrames) {
         // Configurar la animación
         if (animationTimeline != null) {
             animationTimeline.stop();
@@ -361,11 +356,11 @@ public class frmMain {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void updateFrame(grhData selectedGrh) {
+    private void updateFrame(GrhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
         if (currentFrameIndex > 0 && currentFrameIndex < frames.length) {
-            grhData currentGrh = grhList.get(frames[currentFrameIndex]);
+            GrhData currentGrh = grhList.get(frames[currentFrameIndex]);
 
             String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
 
@@ -397,7 +392,7 @@ public class frmMain {
      * @param grhImage    La imagen completa del gráfico.
      * @param selectedGrh El gráfico seleccionado que contiene la información de la región del índice.
      */
-    private void drawFullImage(Image grhImage, grhData selectedGrh) {
+    private void drawFullImage(Image grhImage, GrhData selectedGrh) {
         // Dibuja la imagen completa del gráfico en el ImageView
         imgGrafico.setImage(grhImage);
 
@@ -410,7 +405,7 @@ public class frmMain {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void drawRectangle(grhData selectedGrh) {
+    private void drawRectangle(GrhData selectedGrh) {
         // Obtener las dimensiones del ImageView imgGrafico
         double imgWidth = imgGrafico.getBoundsInLocal().getWidth();
         double imgHeight = imgGrafico.getBoundsInLocal().getHeight();
@@ -474,14 +469,14 @@ public class frmMain {
         try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
             bufferWriter.write("[INIT]");
             bufferWriter.newLine();
-            bufferWriter.write("NumGrh=" + grhDataManager.getGrhCount());
+            bufferWriter.write("NumGrh=" + dataManager.getGrhCount());
             bufferWriter.newLine();
-            bufferWriter.write("Version=" + grhDataManager.getVersion());
+            bufferWriter.write("Version=" + dataManager.getGrhVersion());
             bufferWriter.newLine();
             bufferWriter.write("[GRAPHICS]");
             bufferWriter.newLine();
 
-            for (grhData grh : grhList) {
+            for (GrhData grh : grhList) {
                 if (grh.getNumFrames() > 1) {
                     bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-");
 
@@ -569,7 +564,7 @@ public class frmMain {
         // Nos aseguramos de que el índice es válido
         if (selectedIndex >= 0) {
             // Obtenemos el objeto grhData correspondiente al índice seleccionado
-            grhData selectedGrh = grhList.get(selectedIndex);
+            GrhData selectedGrh = grhList.get(selectedIndex);
 
             // Comenzamos aplicar los cambios:
             selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
@@ -709,13 +704,13 @@ public class frmMain {
      */
     @FXML
     private void btnAdd_OnAction() {
-        int grhCount = grhDataManager.getGrhCount() + 1;
+        int grhCount = dataManager.getGrhCount() + 1;
 
         // Incrementar el contador de grhDataManager
-        grhDataManager.setGrhCount(grhCount);
+        dataManager.setGrhCount(grhCount);
 
         // Crear un nuevo objeto grhData con los valores adecuados
-        grhData newGrhData = new grhData(grhCount, (short) 1, 0, (short) 0, (short) 0, (short) 0, (short) 0);
+        GrhData newGrhData = new GrhData(grhCount, (short) 1, 0, (short) 0, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstIndices.getItems().add(String.valueOf(grhCount));
@@ -746,13 +741,13 @@ public class frmMain {
             file.seek(0);
 
             // Escribir la versión del archivo
-            file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getVersion()));
+            file.writeInt(byteMigration.bigToLittle_Int(dataManager.getGrhVersion()));
 
             // Escribir la cantidad de gráficos indexados
-            file.writeInt(byteMigration.bigToLittle_Int(grhDataManager.getGrhCount()));
+            file.writeInt(byteMigration.bigToLittle_Int(dataManager.getGrhCount()));
 
             // Escribir cada gráfico en el archivo
-            for (grhData grh : grhList) {
+            for (GrhData grh : grhList) {
                 // Escribir el número de gráfico y el número de frames
                 file.writeInt(byteMigration.bigToLittle_Int(grh.getGrh()));
                 file.writeShort(byteMigration.bigToLittle_Short(grh.getNumFrames()));
@@ -888,7 +883,7 @@ public class frmMain {
                     }
 
                 } else {
-                    System.out.println("Indice invalido. Solo se aceptan indices desde el 1 hasta el " + grhDataManager.getGrhCount());
+                    System.out.println("Indice invalido. Solo se aceptan indices desde el 1 hasta el " + dataManager.getGrhCount());
                 }
 
             } catch (NumberFormatException e) {
@@ -926,7 +921,7 @@ public class frmMain {
                 // Verificamos si se ha seleccionado un índice
                 if (selectedIndex >= 0) {
                     // Obtenemos el objeto grhData seleccionado en la lista de índices
-                    grhData selectedGrh = grhList.get(selectedIndex);
+                    GrhData selectedGrh = grhList.get(selectedIndex);
 
                     // Obtenemos los frames actuales del objeto grhData
                     int[] frames = selectedGrh.getFrames();

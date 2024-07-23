@@ -13,7 +13,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import org.nexus.indexador.models.helmetData;
+import org.nexus.indexador.gamedata.DataManager;
+import org.nexus.indexador.gamedata.models.HelmetData;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,18 +48,21 @@ public class frmCascos {
     @FXML
     public Button btnDelete;
 
-    private helmetData helmetDataManager; // Objeto que gestiona los datos de los cascos, incluyendo la carga y manipulación de los mismos
-    private ObservableList<helmetData> helmetList; // Lista observable que contiene los datos de los gráficos indexados.
+    private HelmetData helmetDataManager; // Objeto que gestiona los datos de los cascos, incluyendo la carga y manipulación de los mismos
+    private ObservableList<HelmetData> helmetList; // Lista observable que contiene los datos de los gráficos indexados.
 
-    private org.nexus.indexador.utils.configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private ConfigManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private DataManager dataManager;
 
     /**
      * Inicializa el controlador, cargando la configuración y los datos de los cascos.
      */
     @FXML
-    protected void initialize() {
-        configManager = org.nexus.indexador.utils.configManager.getInstance();
-        helmetDataManager = new helmetData(); // Crear una instancia de helmetData
+    protected void initialize() throws IOException {
+        configManager = ConfigManager.getInstance();
+        dataManager = DataManager.getInstance();
+
+        helmetDataManager = new HelmetData(); // Crear una instancia de helmetData
         loadHelmetData();
         setupHelmetListListener();
     }
@@ -68,10 +73,10 @@ public class frmCascos {
     private void loadHelmetData() {
         try {
             // Llamar al método para leer el archivo binario y obtener la lista de helmetData
-            helmetList = helmetDataManager.readHelmetFile();
+            helmetList = dataManager.readHelmetFile();
 
             // Actualizar el texto de los labels con la información obtenida
-            lblNCascos.setText("Cascos cargados: " + helmetData.getNumHelmets());
+            lblNCascos.setText("Cascos cargados: " + dataManager.getNumHelmets());
 
             // Agregar los índices de gráficos al ListView
             ObservableList<String> helmetIndices = FXCollections.observableArrayList();
@@ -98,7 +103,7 @@ public class frmCascos {
 
             if (selectedIndex >= 0) {
                 // Obtener el objeto helmetData correspondiente al índice seleccionado
-                helmetData selectedHelmet = helmetList.get(selectedIndex);
+                HelmetData selectedHelmet = helmetList.get(selectedIndex);
                 updateEditor(selectedHelmet);
 
                 for (int i = 0; i <= 3; i++) {
@@ -113,7 +118,7 @@ public class frmCascos {
      *
      * @param selectedHelmet el objeto helmetData seleccionado.
      */
-    private void updateEditor(helmetData selectedHelmet) {
+    private void updateEditor(HelmetData selectedHelmet) {
         // Obtenemos todos los datos
         short Texture = selectedHelmet.getTexture();
         short StartX = selectedHelmet.getStartX();
@@ -130,7 +135,7 @@ public class frmCascos {
      * @param selectedHelmet el objeto helmetData seleccionado.
      * @param helmeting la dirección en la que se debe dibujar el casco (0: Sur, 1: Norte, 2: Oeste, 3: Este).
      */
-    private void drawHelmets(helmetData selectedHelmet, int helmeting) {
+    private void drawHelmets(HelmetData selectedHelmet, int helmeting) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedHelmet.getTexture() + ".png";
         File imageFile = new File(imagePath);
@@ -203,7 +208,7 @@ public class frmCascos {
         // Nos aseguramos de que el índice es válido
         if (selectedHelmetIndex >= 0) {
             // Obtenemos el objeto helmetData correspondiente al índice seleccionado
-            helmetData selectedHelmet = helmetList.get(selectedHelmetIndex);
+            HelmetData selectedHelmet = helmetList.get(selectedHelmetIndex);
 
             // Comenzamos aplicar los cambios:
             selectedHelmet.setTexture(Short.parseShort(txtNGrafico.getText()));
@@ -219,13 +224,13 @@ public class frmCascos {
      */
     @FXML
     private void btnAdd_OnAction() {
-        int helmetCount = helmetDataManager.getNumHelmets() + 1;
+        int helmetCount = dataManager.getNumHelmets() + 1;
 
         // Incrementar el contador de helmetDataManager
-        helmetData.setNumHelmets((short) helmetCount);
+        dataManager.setNumHelmets((short) helmetCount);
 
         // Crear un nuevo objeto helmetData con los valores adecuados
-        helmetData newHelmetData = new helmetData(2, (short) 0, (short) 0, (short) 0);
+        HelmetData newHelmetData = new HelmetData(2, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstHelmets.getItems().add(String.valueOf(helmetCount));

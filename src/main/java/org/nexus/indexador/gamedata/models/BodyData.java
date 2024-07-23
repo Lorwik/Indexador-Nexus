@@ -1,13 +1,13 @@
-package org.nexus.indexador.models;
+package org.nexus.indexador.gamedata.models;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.nexus.indexador.utils.byteMigration;
-import org.nexus.indexador.utils.configManager;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.*;
 
-public class bodyData {
+public class BodyData {
 
     private int[] Body;
     private short HeadOffsetX;
@@ -15,13 +15,13 @@ public class bodyData {
 
     private static short NumBodys;
 
-    public bodyData(int[] body, short headOffsetX, short headOffsetY) {
+    public BodyData(int[] body, short headOffsetX, short headOffsetY) {
         this.Body = body;
         this.HeadOffsetX = headOffsetX;
         this.HeadOffsetY = headOffsetY;
     }
 
-    public bodyData() {}
+    public BodyData() {}
 
     public int[] getBody() {
         return Body;
@@ -55,9 +55,9 @@ public class bodyData {
         NumBodys = numBodys;
     }
 
-    public ObservableList<bodyData> readBodyFile() throws IOException {
-        configManager configManager = org.nexus.indexador.utils.configManager.getInstance();
-        ObservableList<bodyData> BodyList = FXCollections.observableArrayList();
+    public ObservableList<BodyData> readBodyFile() throws IOException {
+        ConfigManager configManager = ConfigManager.getInstance();
+        ObservableList<BodyData> BodyList = FXCollections.observableArrayList();
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         File archivo = new File(configManager.getInitDir() + "personajes.ind");
 
@@ -73,7 +73,7 @@ public class bodyData {
                 }
                 short headOffsetX = byteMigration.bigToLittle_Short(file.readShort());
                 short headOffsetY = byteMigration.bigToLittle_Short(file.readShort());
-                bodyData data = new bodyData(body, headOffsetX, headOffsetY);
+                BodyData data = new BodyData(body, headOffsetX, headOffsetY);
                 BodyList.add(data);
             }
 

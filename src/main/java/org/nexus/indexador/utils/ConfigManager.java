@@ -2,10 +2,10 @@ package org.nexus.indexador.utils;
 
 import java.io.*;
 
-public class configManager {
+public class ConfigManager {
 
     // Instancia única de ByteMigration
-    private static configManager instance;
+    private static ConfigManager instance;
 
     private String graphicsDir;
     private String initDir;
@@ -14,11 +14,11 @@ public class configManager {
     private static final String CONFIG_FILE_NAME = "config.ini";
     private static final String CONFIG_FILE_PATH = Thread.currentThread().getContextClassLoader().getResource(CONFIG_FILE_NAME).getPath();
 
-    public configManager() {}
+    public ConfigManager() {}
 
-    public static configManager getInstance() {
+    public static ConfigManager getInstance() {
         if (instance == null) {
-            instance = new configManager();
+            instance = new ConfigManager();
         }
         return instance;
     }
