@@ -17,8 +17,8 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.util.Duration;
 import org.nexus.indexador.gamedata.DataManager;
+import org.nexus.indexador.gamedata.models.FXData;
 import org.nexus.indexador.gamedata.models.GrhData;
-import org.nexus.indexador.gamedata.models.ShieldData;
 import org.nexus.indexador.utils.AnimationState;
 import org.nexus.indexador.utils.ConfigManager;
 
@@ -27,28 +27,24 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class frmEscudos {
+public class frmFXs {
 
     @FXML
-    public ListView lstShields;
+    public ListView lstFxs;
     @FXML
-    public ImageView imgOeste;
+    public ImageView imgFX;
     @FXML
-    public ImageView imgNorte;
+    public TextField txtFX;
     @FXML
-    public ImageView imgEste;
+    public Label lblNFXs;
     @FXML
-    public ImageView imgSur;
+    public TextField txtOffsetX;
     @FXML
-    public TextField txtNorte;
+    public Label lblOffsetX;
     @FXML
-    public TextField txtEste;
+    public TextField txtOffsetY;
     @FXML
-    public TextField txtSur;
-    @FXML
-    public TextField txtOeste;
-    @FXML
-    public Label lblNEscudos;
+    public Label lblOffsetY;
     @FXML
     public Button btnSave;
     @FXML
@@ -56,8 +52,8 @@ public class frmEscudos {
     @FXML
     public Button btnDelete;
 
-    private ShieldData shieldDataManager; // Objeto que gestiona los datos de los escudos, incluyendo la carga y manipulación de los mismos
-    private ObservableList<ShieldData> shieldList;
+    private FXData fxDataManager; // Objeto que gestiona los datos de los FXs, incluyendo la carga y manipulación de los mismos
+    private ObservableList<FXData> fxList;
     private ObservableList<GrhData> grhList;
 
     private ConfigManager configManager;
@@ -68,6 +64,11 @@ public class frmEscudos {
     // Clase con los datos de la animación y el mapa para la búsqueda rápida
     private Map<Integer, GrhData> grhDataMap;
 
+    // Índice del frame actual en la animación.
+    private int currentFrameIndex = 1;
+    // Línea de tiempo que controla la animación de los frames en el visor.
+    private Timeline animationTimeline;
+
     /**
      * Inicializa el controlador, cargando la configuración y los datos de los cuerpos.
      */
@@ -76,23 +77,23 @@ public class frmEscudos {
         configManager = ConfigManager.getInstance();
         dataManager = DataManager.getInstance();
 
-        shieldDataManager = new ShieldData(); // Crear una instancia de headData
+        fxDataManager = new FXData(); // Crear una instancia de headData
 
         animationStates.put(0, new AnimationState());
         animationStates.put(1, new AnimationState());
         animationStates.put(2, new AnimationState());
         animationStates.put(3, new AnimationState());
 
-        loadShieldData();
-        setupHeadListListener();
+        loadFxData();
+        setupFXListListener();
     }
 
     /**
      * Carga los datos de los cuerpos desde un archivo y los muestra en la interfaz.
      */
-    private void loadShieldData() {
+    private void loadFxData() {
         // Llamar al método para leer el archivo binario y obtener la lista de headData
-        shieldList = dataManager.getShieldList();
+        fxList = dataManager.getFXList();
 
         // Inicializar el mapa de grhData
         grhDataMap = new HashMap<>();
@@ -105,36 +106,34 @@ public class frmEscudos {
         }
 
         // Actualizar el texto de los labels con la información obtenida
-        lblNEscudos.setText("Escudos cargados: " + dataManager.getNumShields());
+        lblNFXs.setText("FXs cargados: " + dataManager.getNumFXs());
 
         // Agregar los índices de gráficos al ListView
-        ObservableList<String> shieldIndices = FXCollections.observableArrayList();
-        for (int i = 1; i < shieldList.size() + 1; i++) {
-            shieldIndices.add(String.valueOf(i));
+        ObservableList<String> fxIndices = FXCollections.observableArrayList();
+        for (int i = 1; i < fxList.size() + 1; i++) {
+            fxIndices.add(String.valueOf(i));
         }
 
-        lstShields.setItems(shieldIndices);
+        lstFxs.setItems(fxIndices);
 
     }
 
     /**
      * Configura un listener para el ListView, manejando los eventos de selección de ítems.
      */
-    private void setupHeadListListener() {
+    private void setupFXListListener() {
         // Agregar un listener al ListView para capturar los eventos de selección
-        lstShields.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        lstFxs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 
             // Obtener el índice seleccionado
-            int selectedIndex = lstShields.getSelectionModel().getSelectedIndex();
+            int selectedIndex = lstFxs.getSelectionModel().getSelectedIndex();
 
             if (selectedIndex >= 0) {
                 // Obtener el objeto headData correspondiente al índice seleccionado
-                ShieldData selectedShield = shieldList.get(selectedIndex);
-                updateEditor(selectedShield);
+                FXData selectedFx = fxList.get(selectedIndex);
+                updateEditor(selectedFx);
+                displayAnimation(selectedFx);
 
-                for (int i = 0; i <= 3; i++) {
-                    drawShields(selectedShield, i);
-                }
             }
         });
     }
@@ -142,56 +141,53 @@ public class frmEscudos {
     /**
      * Actualiza el editor de la interfaz con los datos de la cabeza seleccionada.
      *
-     * @param selectedShield el objeto headData seleccionado.
+     * @param selectedFx el objeto headData seleccionado.
      */
-    private void updateEditor(ShieldData selectedShield) {
+    private void updateEditor(FXData selectedFx) {
         // Obtenemos todos los datos
-        int grhShields[] = selectedShield.getShield();
+        int grhFxs = selectedFx.getFx();
+        int offsetX = selectedFx.getOffsetX();
+        int offsetY = selectedFx.getOffsetY();
 
-        txtNorte.setText(String.valueOf(grhShields[0]));
-        txtEste.setText(String.valueOf(grhShields[1]));
-        txtSur.setText(String.valueOf(grhShields[2]));
-        txtOeste.setText(String.valueOf(grhShields[3]));
+        txtFX.setText(String.valueOf(grhFxs));
+        txtOffsetX.setText(String.valueOf(offsetX));
+        txtOffsetY.setText(String.valueOf(offsetY));
     }
 
     /**
-     * Dibuja las imágenes de los cuerpos en las diferentes vistas (Norte, Sur, Este, Oeste).
+     * Muestra una animación en el ImageView correspondiente al gráfico seleccionado.
+     * Configura y ejecuta una animación de fotogramas clave para mostrar la animación.
+     * La animación se ejecuta en un bucle infinito hasta que se detenga explícitamente.
      *
-     * @param selectedShield el objeto headData seleccionado.
-     * @param heading la dirección en la que se debe dibujar la cabeza (0: Sur, 1: Norte, 2: Oeste, 3: Este).
+     * @param selectedFX El gráfico seleccionado.
      */
-    private void drawShields(ShieldData selectedShield, int heading) {
-        int[] bodies = selectedShield.getShield();
+    private void displayAnimation(FXData selectedFX) {
 
-        //Obtenemos el Grh de animación desde el indice del shield + el heading
-        GrhData selectedGrh = grhDataMap.get(bodies[heading]);
+        //Obtenemos el Grh de animación desde el indice del FX
+        GrhData selectedGrh = grhDataMap.get(selectedFX.getFx());
 
         int nFrames = selectedGrh.getNumFrames();
 
-        AnimationState animationState = animationStates.get(heading);
-        Timeline animationTimeline = animationState.getTimeline();
-
+        // Configurar la animación
         if (animationTimeline != null) {
             animationTimeline.stop();
         }
 
-        animationTimeline.getKeyFrames().clear();
-        animationState.setCurrentFrameIndex(1); // Reiniciar el índice del frame a 1
+        currentFrameIndex = 1; // Reiniciar el índice del frame al iniciar la animación
 
-        animationTimeline.getKeyFrames().add(
+        animationTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, event -> {
                     // Actualizar la imagen en el ImageView con el frame actual
-                    updateFrame(selectedGrh, heading);
-                    animationState.setCurrentFrameIndex((animationState.getCurrentFrameIndex() + 1) % nFrames); // Avanzar al siguiente frame circularmente
-                    if (animationState.getCurrentFrameIndex() == 0) {
-                        animationState.setCurrentFrameIndex(1); // Omitir la posición 0
+                    updateFrame(selectedGrh);
+                    currentFrameIndex = (currentFrameIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
+                    if (currentFrameIndex == 0) {
+                        currentFrameIndex = 1; // Omitir la posición 0
                     }
-                })
+                }),
+                new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
         );
-
-        animationTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(100)));
-        animationTimeline.setCycleCount(Animation.INDEFINITE);
-        animationTimeline.play();
+        animationTimeline.setCycleCount(Animation.INDEFINITE); // Repetir la animación indefinidamente
+        animationTimeline.play(); // Iniciar la animación
     }
 
     /**
@@ -200,12 +196,10 @@ public class frmEscudos {
      *
      * @param selectedGrh El gráfico seleccionado.
      */
-    private void updateFrame(GrhData selectedGrh, int heading) {
-        int[] frames = selectedGrh.getFrames();
+    private void updateFrame(GrhData selectedGrh) {
+        int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
-        AnimationState animationState = animationStates.get(heading);
-        int currentFrameIndex = animationState.getCurrentFrameIndex();
-
+        // Verificar que el índice actual esté dentro del rango adecuado
         if (currentFrameIndex >= 0 && currentFrameIndex < frames.length) {
             int frameId = frames[currentFrameIndex];
 
@@ -219,30 +213,20 @@ public class frmEscudos {
                 // Verificar si el archivo de imagen existe
                 if (imageFile.exists()) {
                     Image frameImage = new Image(imagePath);
+
                     PixelReader pixelReader = frameImage.getPixelReader();
                     WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
-
-                    switch (heading) {
-                        case 0:
-                            imgSur.setImage(croppedImage);
-                            break;
-                        case 1:
-                            imgNorte.setImage(croppedImage);
-                            break;
-                        case 2:
-                            imgOeste.setImage(croppedImage);
-                            break;
-                        case 3:
-                            imgEste.setImage(croppedImage);
-                            break;
-                    }
+                    imgFX.setImage(croppedImage);
                 } else {
+                    // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
                     System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
                 }
             } else {
-                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frames[currentFrameIndex]);
+                // No se encontró el GrhData correspondiente
+                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frameId);
             }
         } else {
+            // El índice actual está fuera del rango adecuado
             System.out.println("updateFrame: El índice actual está fuera del rango adecuado: " + currentFrameIndex);
         }
     }

@@ -57,6 +57,9 @@ public class frmCargando {
                 Platform.runLater(() -> lblStatus.setText("Cargando indice de escudos..."));
                 dataManager.readShieldFile();
 
+                Platform.runLater(() -> lblStatus.setText("Cargando indice de FXs..."));
+                dataManager.readFXsdFile();
+
             } catch (IOException e) {
                 System.err.println("Error al leer la configuración: " + e.getMessage());
             }

@@ -144,6 +144,7 @@ public class frmMain {
     private static boolean helmetsOpen = false;
     private static boolean bodysOpen = false;
     private static boolean shieldsOpen = false;
+    private static boolean fxsOpen = false;
 
     // Índice del frame actual en la animación.
     private int currentFrameIndex = 1;
@@ -919,6 +920,29 @@ public class frmMain {
     }
 
     public void mnuFXs_OnAction(ActionEvent actionEvent) {
+        if (!fxsOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("FXs");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmFXs.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                fxsOpen = true;
+
+                consoleStage.setOnCloseRequest(event -> {
+                    fxsOpen = false;
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     public void mnuAsistente_OnAction(ActionEvent actionEvent) {
