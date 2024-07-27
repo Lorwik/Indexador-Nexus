@@ -17,6 +17,7 @@ public class DataManager {
     private ObservableList<HelmetData> helmetList;
     private ObservableList<BodyData> bodyList;
     private ObservableList<ShieldData> shieldList;
+    private ObservableList<FXData> fxList;
 
     private int GrhCount;
     private int GrhVersion;
@@ -24,6 +25,7 @@ public class DataManager {
     private short NumHelmets;
     private short NumBodys;
     private short NumShields;
+    private short NumFXs;
 
     private final ConfigManager configManager;
     private final byteMigration byteMigration;
@@ -57,6 +59,7 @@ public class DataManager {
     public ObservableList<HelmetData> getHelmetList() { return helmetList; }
     public ObservableList<BodyData> getBodyList() { return bodyList; }
     public ObservableList<ShieldData> getShieldList() { return shieldList; }
+    public ObservableList<FXData> getFXList() { return fxList; }
 
     public int getGrhCount() { return GrhCount; }
     public int getGrhVersion() {return GrhVersion;}
@@ -64,6 +67,7 @@ public class DataManager {
     public short getNumHelmets() { return NumHelmets; }
     public short getNumBodys() { return NumBodys; }
     public short getNumShields() { return NumShields; }
+    public short getNumFXs() { return NumFXs; }
 
     public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
     public void setGrhVersion(int GrhVersion) { this.GrhVersion = GrhVersion; }
@@ -71,6 +75,7 @@ public class DataManager {
     public void setNumHeads(short numHeads) { NumHeads = numHeads; }
     public void setNumBodys(short numBodys) { NumBodys = numBodys; }
     public void setNumShields(short numShields) { NumShields = numShields; }
+    public void setNumFXs(short numFXs) { NumShields = numFXs; }
 
     /**
      * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
@@ -338,6 +343,43 @@ public class DataManager {
         }
 
         return shieldList;
+    }
+
+    public ObservableList<FXData> readFXsdFile() throws IOException {
+        ConfigManager configManager = ConfigManager.getInstance();
+
+        fxList = FXCollections.observableArrayList();
+
+        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+        File archivo = new File(configManager.getInitDir() + "FXs.ind");
+
+        try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
+            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            file.seek(0);
+            NumFXs = byteMigration.bigToLittle_Short(file.readShort());
+
+            for (int i = 0; i < NumFXs; i++) {
+
+                int fx = byteMigration.bigToLittle_Int(file.readInt());
+                short offsetX = byteMigration.bigToLittle_Short(file.readShort());
+                short offsetY = byteMigration.bigToLittle_Short(file.readShort());
+
+                FXData data = new FXData(fx,offsetX, offsetY);
+                fxList.add(data);
+
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        } catch (EOFException e) {
+            System.out.println("Fin de fichero");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+
+        return fxList;
     }
 
 }
