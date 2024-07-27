@@ -69,6 +69,9 @@ public class frmCuerpos {
 
     private Map<Integer, AnimationState> animationStates = new HashMap<>();
 
+    // Clase con los datos de la animación y el mapa para la búsqueda rápida
+    private Map<Integer, GrhData> grhDataMap;
+
     /**
      * Inicializa el controlador, cargando la configuración y los datos de los cuerpos.
      */
@@ -94,6 +97,16 @@ public class frmCuerpos {
     private void loadBodyData() {
         // Llamar al método para leer el archivo binario y obtener la lista de headData
         bodyList = dataManager.getBodyList();
+
+        // Inicializar el mapa de grhData
+        grhDataMap = new HashMap<>();
+
+        grhList = dataManager.getGrhList();
+
+        // Llenar el mapa con los datos de grhList
+        for (GrhData grh : grhList) {
+            grhDataMap.put(grh.getGrh(), grh);
+        }
 
         // Actualizar el texto de los labels con la información obtenida
         lblNCuerpos.setText("Cuerpos cargados: " + dataManager.getNumBodys());
@@ -156,10 +169,11 @@ public class frmCuerpos {
      * @param heading la dirección en la que se debe dibujar la cabeza (0: Sur, 1: Norte, 2: Oeste, 3: Este).
      */
     private void drawBodys(BodyData selectedBody, int heading) {
-        int[] Bodys = selectedBody.getBody();
-        grhList = dataManager.getGrhList();
+        int[] bodies = selectedBody.getBody();
 
-        GrhData selectedGrh = grhList.get(Bodys[heading]);
+        //Obtenemos el Grh de animación desde el indice del body + el heading
+        GrhData selectedGrh = grhDataMap.get(bodies[heading]);
+
         int nFrames = selectedGrh.getNumFrames();
 
         AnimationState animationState = animationStates.get(heading);
@@ -170,12 +184,16 @@ public class frmCuerpos {
         }
 
         animationTimeline.getKeyFrames().clear();
-        animationState.setCurrentFrameIndex(0);
+        animationState.setCurrentFrameIndex(1); // Reiniciar el índice del frame a 1
 
         animationTimeline.getKeyFrames().add(
                 new KeyFrame(Duration.ZERO, event -> {
+                    // Actualizar la imagen en el ImageView con el frame actual
                     updateFrame(selectedGrh, heading);
-                    animationState.setCurrentFrameIndex((animationState.getCurrentFrameIndex() + 1) % nFrames);
+                    animationState.setCurrentFrameIndex((animationState.getCurrentFrameIndex() + 1) % nFrames); // Avanzar al siguiente frame circularmente
+                    if (animationState.getCurrentFrameIndex() == 0) {
+                        animationState.setCurrentFrameIndex(1); // Omitir la posición 0
+                    }
                 })
         );
 
@@ -192,37 +210,48 @@ public class frmCuerpos {
      */
     private void updateFrame(GrhData selectedGrh, int heading) {
         int[] frames = selectedGrh.getFrames();
+
         AnimationState animationState = animationStates.get(heading);
         int currentFrameIndex = animationState.getCurrentFrameIndex();
 
         if (currentFrameIndex >= 0 && currentFrameIndex < frames.length) {
-            GrhData currentGrh = grhList.get(frames[currentFrameIndex]);
+            int frameId = frames[currentFrameIndex];
 
-            String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
-            File imageFile = new File(imagePath);
+            // Buscar el GrhData correspondiente al frameId utilizando el mapa
+            GrhData currentGrh = grhDataMap.get(frameId);
 
-            if (imageFile.exists()) {
-                Image frameImage = new Image(imagePath);
-                PixelReader pixelReader = frameImage.getPixelReader();
-                WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
+            if (currentGrh != null) {
+                String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
+                File imageFile = new File(imagePath);
 
-                switch (heading) {
-                    case 0:
-                        imgSur.setImage(croppedImage);
-                        break;
-                    case 1:
-                        imgNorte.setImage(croppedImage);
-                        break;
-                    case 2:
-                        imgOeste.setImage(croppedImage);
-                        break;
-                    case 3:
-                        imgEste.setImage(croppedImage);
-                        break;
+                // Verificar si el archivo de imagen existe
+                if (imageFile.exists()) {
+                    Image frameImage = new Image(imagePath);
+                    PixelReader pixelReader = frameImage.getPixelReader();
+                    WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
+
+                    switch (heading) {
+                        case 0:
+                            imgSur.setImage(croppedImage);
+                            break;
+                        case 1:
+                            imgNorte.setImage(croppedImage);
+                            break;
+                        case 2:
+                            imgOeste.setImage(croppedImage);
+                            break;
+                        case 3:
+                            imgEste.setImage(croppedImage);
+                            break;
+                    }
+                } else {
+                    System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
                 }
             } else {
-                System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
+                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frames[currentFrameIndex]);
             }
+        } else {
+            System.out.println("updateFrame: El índice actual está fuera del rango adecuado: " + currentFrameIndex);
         }
     }
 
