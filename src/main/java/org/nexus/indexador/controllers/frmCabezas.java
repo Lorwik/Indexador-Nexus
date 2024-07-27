@@ -13,7 +13,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import org.nexus.indexador.models.headData;
+import org.nexus.indexador.gamedata.DataManager;
+import org.nexus.indexador.gamedata.models.HeadData;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,18 +48,21 @@ public class frmCabezas {
     @FXML
     public Button btnDelete;
 
-    private headData headDataManager; // Objeto que gestiona los datos de las cabezas, incluyendo la carga y manipulación de los mismos
-    private ObservableList<headData> headList; // Lista observable que contiene los datos de los gráficos indexados.
+    private HeadData headDataManager; // Objeto que gestiona los datos de las cabezas, incluyendo la carga y manipulación de los mismos
+    private ObservableList<HeadData> headList; // Lista observable que contiene los datos de los gráficos indexados.
 
-    private org.nexus.indexador.utils.configManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private ConfigManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private DataManager dataManager;
 
     /**
      * Inicializa el controlador, cargando la configuración y los datos de las cabezas.
      */
     @FXML
-    protected void initialize() {
-        configManager = org.nexus.indexador.utils.configManager.getInstance();
-        headDataManager = new headData(); // Crear una instancia de headData
+    protected void initialize() throws IOException {
+        configManager = ConfigManager.getInstance();
+        dataManager = DataManager.getInstance();
+
+        headDataManager = new HeadData(); // Crear una instancia de headData
         loadHeadData();
         setupHeadListListener();
     }
@@ -66,24 +71,20 @@ public class frmCabezas {
      * Carga los datos de las cabezas desde un archivo y los muestra en la interfaz.
      */
     private void loadHeadData() {
-        try {
-            // Llamar al método para leer el archivo binario y obtener la lista de headData
-            headList = headDataManager.readHeadFile();
+        // Llamar al método para leer el archivo binario y obtener la lista de headData
+        headList = dataManager.getHeadList();
 
-            // Actualizar el texto de los labels con la información obtenida
-            lblNCabezas.setText("Cabezas cargadas: " + headData.getNumHeads());
+        // Actualizar el texto de los labels con la información obtenida
+        lblNCabezas.setText("Cabezas cargadas: " + dataManager.getNumHeads());
 
-            // Agregar los índices de gráficos al ListView
-            ObservableList<String> headIndices = FXCollections.observableArrayList();
-            for (int i = 1; i < headList.size() + 1; i++) {
-                headIndices.add(String.valueOf(i));
-            }
-
-            lstHeads.setItems(headIndices);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Agregar los índices de gráficos al ListView
+        ObservableList<String> headIndices = FXCollections.observableArrayList();
+        for (int i = 1; i < headList.size() + 1; i++) {
+            headIndices.add(String.valueOf(i));
         }
+
+        lstHeads.setItems(headIndices);
+
     }
 
     /**
@@ -98,7 +99,7 @@ public class frmCabezas {
 
             if (selectedIndex >= 0) {
                 // Obtener el objeto headData correspondiente al índice seleccionado
-                headData selectedHead = headList.get(selectedIndex);
+                HeadData selectedHead = headList.get(selectedIndex);
                 updateEditor(selectedHead);
 
                 for (int i = 0; i <= 3; i++) {
@@ -113,7 +114,7 @@ public class frmCabezas {
      *
      * @param selectedHead el objeto headData seleccionado.
      */
-    private void updateEditor(headData selectedHead) {
+    private void updateEditor(HeadData selectedHead) {
         // Obtenemos todos los datos
         short Texture = selectedHead.getTexture();
         short StartX = selectedHead.getStartX();
@@ -130,7 +131,7 @@ public class frmCabezas {
      * @param selectedHead el objeto headData seleccionado.
      * @param heading la dirección en la que se debe dibujar la cabeza (0: Sur, 1: Norte, 2: Oeste, 3: Este).
      */
-    private void drawHeads(headData selectedHead, int heading) {
+    private void drawHeads(HeadData selectedHead, int heading) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedHead.getTexture() + ".png";
         File imageFile = new File(imagePath);
@@ -203,7 +204,7 @@ public class frmCabezas {
         // Nos aseguramos de que el índice es válido
         if (selectedHeadIndex >= 0) {
             // Obtenemos el objeto headData correspondiente al índice seleccionado
-            headData selectedHead = headList.get(selectedHeadIndex);
+            HeadData selectedHead = headList.get(selectedHeadIndex);
 
             // Comenzamos aplicar los cambios:
             selectedHead.setTexture(Short.parseShort(txtNGrafico.getText()));
@@ -219,13 +220,13 @@ public class frmCabezas {
      */
     @FXML
     private void btnAdd_OnAction() {
-        int headCount = headDataManager.getNumHeads() + 1;
+        int headCount = dataManager.getNumHeads() + 1;
 
         // Incrementar el contador de headDataManager
-        headData.setNumHeads((short) headCount);
+        dataManager.setNumHeads((short) headCount);
 
         // Crear un nuevo objeto headData con los valores adecuados
-        headData newHeadData = new headData(1, (short) 0, (short) 0, (short) 0);
+        HeadData newHeadData = new HeadData(1, (short) 0, (short) 0, (short) 0);
 
         // Agregar el nuevo elemento al ListView
         lstHeads.getItems().add(String.valueOf(headCount));
