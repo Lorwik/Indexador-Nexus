@@ -2,10 +2,7 @@ package org.nexus.indexador.gamedata;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.nexus.indexador.gamedata.models.BodyData;
-import org.nexus.indexador.gamedata.models.GrhData;
-import org.nexus.indexador.gamedata.models.HeadData;
-import org.nexus.indexador.gamedata.models.HelmetData;
+import org.nexus.indexador.gamedata.models.*;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
 
@@ -19,12 +16,14 @@ public class DataManager {
     private ObservableList<HeadData> headList;
     private ObservableList<HelmetData> helmetList;
     private ObservableList<BodyData> bodyList;
+    private ObservableList<ShieldData> shieldList;
 
     private int GrhCount;
     private int GrhVersion;
     private short NumHeads;
     private short NumHelmets;
     private short NumBodys;
+    private short NumShields;
 
     private final ConfigManager configManager;
     private final byteMigration byteMigration;
@@ -57,18 +56,21 @@ public class DataManager {
     public ObservableList<HeadData> getHeadList() { return headList; }
     public ObservableList<HelmetData> getHelmetList() { return helmetList; }
     public ObservableList<BodyData> getBodyList() { return bodyList; }
+    public ObservableList<ShieldData> getShieldList() { return shieldList; }
 
     public int getGrhCount() { return GrhCount; }
     public int getGrhVersion() {return GrhVersion;}
     public short getNumHeads() { return NumHeads; }
     public short getNumHelmets() { return NumHelmets; }
     public short getNumBodys() { return NumBodys; }
+    public short getNumShields() { return NumShields; }
 
     public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
     public void setGrhVersion(int GrhVersion) { this.GrhVersion = GrhVersion; }
     public void setNumHelmets(short numHelmets) { NumHelmets = numHelmets; }
     public void setNumHeads(short numHeads) { NumHeads = numHeads; }
     public void setNumBodys(short numBodys) { NumBodys = numBodys; }
+    public void setNumShields(short numShields) { NumShields = numShields; }
 
     /**
      * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
@@ -301,6 +303,41 @@ public class DataManager {
         }
 
         return bodyList;
+    }
+
+    public ObservableList<ShieldData> readShieldFile() throws IOException {
+        ConfigManager configManager = ConfigManager.getInstance();
+
+        shieldList = FXCollections.observableArrayList();
+
+        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+        File archivo = new File(configManager.getInitDir() + "escudos.ind");
+
+        try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
+            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            file.seek(0);
+            NumShields = byteMigration.bigToLittle_Short(file.readShort());
+
+            for (int i = 0; i < NumShields; i++) {
+                int[] shield = new int[4];
+                for (int j = 0; j < 4; j++) {
+                    shield[j] = byteMigration.bigToLittle_Int(file.readInt());
+                }
+                ShieldData data = new ShieldData(shield);
+                shieldList.add(data);
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        } catch (EOFException e) {
+            System.out.println("Fin de fichero");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+
+        return shieldList;
     }
 
 }

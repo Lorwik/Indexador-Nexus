@@ -54,6 +54,9 @@ public class frmCargando {
                 Platform.runLater(() -> lblStatus.setText("Cargando indice de cuerpos..."));
                 dataManager.readBodyFile();
 
+                Platform.runLater(() -> lblStatus.setText("Cargando indice de escudos..."));
+                dataManager.readShieldFile();
+
             } catch (IOException e) {
                 System.err.println("Error al leer la configuración: " + e.getMessage());
             }

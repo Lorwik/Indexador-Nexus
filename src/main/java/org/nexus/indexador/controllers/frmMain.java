@@ -143,6 +143,7 @@ public class frmMain {
     private static boolean headsOpen = false;
     private static boolean helmetsOpen = false;
     private static boolean bodysOpen = false;
+    private static boolean shieldsOpen = false;
 
     // Índice del frame actual en la animación.
     private int currentFrameIndex = 1;
@@ -892,6 +893,29 @@ public class frmMain {
     }
 
     public void mnuShield_OnAction(ActionEvent actionEvent) {
+        if (!shieldsOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Escudos");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmEscudos.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                shieldsOpen = true;
+
+                consoleStage.setOnCloseRequest(event -> {
+                    shieldsOpen = false;
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     public void mnuFXs_OnAction(ActionEvent actionEvent) {

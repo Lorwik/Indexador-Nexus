@@ -17,20 +17,20 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.util.Duration;
 import org.nexus.indexador.gamedata.DataManager;
-import org.nexus.indexador.gamedata.models.BodyData;
 import org.nexus.indexador.gamedata.models.GrhData;
-import org.nexus.indexador.utils.ConfigManager;
+import org.nexus.indexador.gamedata.models.ShieldData;
 import org.nexus.indexador.utils.AnimationState;
+import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class frmCuerpos {
+public class frmEscudos {
 
     @FXML
-    public ListView lstBodys;
+    public ListView lstShields;
     @FXML
     public ImageView imgOeste;
     @FXML
@@ -52,7 +52,7 @@ public class frmCuerpos {
     @FXML
     public TextField txtHeadOffsetY;
     @FXML
-    public Label lblNCuerpos;
+    public Label lblNEscudos;
     @FXML
     public Button btnSave;
     @FXML
@@ -60,8 +60,8 @@ public class frmCuerpos {
     @FXML
     public Button btnDelete;
 
-    private BodyData bodyDataManager; // Objeto que gestiona los datos de los cuerpos, incluyendo la carga y manipulación de los mismos
-    private ObservableList<BodyData> bodyList;
+    private ShieldData shieldDataManager; // Objeto que gestiona los datos de los escudos, incluyendo la carga y manipulación de los mismos
+    private ObservableList<ShieldData> shieldList;
     private ObservableList<GrhData> grhList;
 
     private ConfigManager configManager;
@@ -80,23 +80,23 @@ public class frmCuerpos {
         configManager = ConfigManager.getInstance();
         dataManager = DataManager.getInstance();
 
-        bodyDataManager = new BodyData(); // Crear una instancia de headData
+        shieldDataManager = new ShieldData(); // Crear una instancia de headData
 
         animationStates.put(0, new AnimationState());
         animationStates.put(1, new AnimationState());
         animationStates.put(2, new AnimationState());
         animationStates.put(3, new AnimationState());
 
-        loadBodyData();
+        loadShieldData();
         setupHeadListListener();
     }
 
     /**
      * Carga los datos de los cuerpos desde un archivo y los muestra en la interfaz.
      */
-    private void loadBodyData() {
+    private void loadShieldData() {
         // Llamar al método para leer el archivo binario y obtener la lista de headData
-        bodyList = dataManager.getBodyList();
+        shieldList = dataManager.getShieldList();
 
         // Inicializar el mapa de grhData
         grhDataMap = new HashMap<>();
@@ -109,15 +109,15 @@ public class frmCuerpos {
         }
 
         // Actualizar el texto de los labels con la información obtenida
-        lblNCuerpos.setText("Cuerpos cargados: " + dataManager.getNumBodys());
+        lblNEscudos.setText("Escudos cargados: " + dataManager.getNumShields());
 
         // Agregar los índices de gráficos al ListView
-        ObservableList<String> bodyIndices = FXCollections.observableArrayList();
-        for (int i = 1; i < bodyList.size() + 1; i++) {
-            bodyIndices.add(String.valueOf(i));
+        ObservableList<String> shieldIndices = FXCollections.observableArrayList();
+        for (int i = 1; i < shieldList.size() + 1; i++) {
+            shieldIndices.add(String.valueOf(i));
         }
 
-        lstBodys.setItems(bodyIndices);
+        lstShields.setItems(shieldIndices);
 
     }
 
@@ -126,18 +126,18 @@ public class frmCuerpos {
      */
     private void setupHeadListListener() {
         // Agregar un listener al ListView para capturar los eventos de selección
-        lstBodys.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        lstShields.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 
             // Obtener el índice seleccionado
-            int selectedIndex = lstBodys.getSelectionModel().getSelectedIndex();
+            int selectedIndex = lstShields.getSelectionModel().getSelectedIndex();
 
             if (selectedIndex >= 0) {
                 // Obtener el objeto headData correspondiente al índice seleccionado
-                BodyData selectedBody = bodyList.get(selectedIndex);
-                updateEditor(selectedBody);
+                ShieldData selectedShield = shieldList.get(selectedIndex);
+                updateEditor(selectedShield);
 
                 for (int i = 0; i <= 3; i++) {
-                    drawBodys(selectedBody, i);
+                    drawShields(selectedShield, i);
                 }
             }
         });
@@ -146,32 +146,28 @@ public class frmCuerpos {
     /**
      * Actualiza el editor de la interfaz con los datos de la cabeza seleccionada.
      *
-     * @param selectedBody el objeto headData seleccionado.
+     * @param selectedShield el objeto headData seleccionado.
      */
-    private void updateEditor(BodyData selectedBody) {
+    private void updateEditor(ShieldData selectedShield) {
         // Obtenemos todos los datos
-        int grhBodys[] = selectedBody.getBody();
-        short HeadOffsetX = selectedBody.getHeadOffsetX();
-        short HeadOffsetY = selectedBody.getHeadOffsetY();
+        int grhShields[] = selectedShield.getShield();
 
-        txtNorte.setText(String.valueOf(grhBodys[0]));
-        txtEste.setText(String.valueOf(grhBodys[1]));
-        txtSur.setText(String.valueOf(grhBodys[2]));
-        txtOeste.setText(String.valueOf(grhBodys[3]));
-        txtHeadOffsetX.setText(String.valueOf(HeadOffsetX));
-        txtHeadOffsetY.setText(String.valueOf(HeadOffsetY));
+        txtNorte.setText(String.valueOf(grhShields[0]));
+        txtEste.setText(String.valueOf(grhShields[1]));
+        txtSur.setText(String.valueOf(grhShields[2]));
+        txtOeste.setText(String.valueOf(grhShields[3]));
     }
 
     /**
      * Dibuja las imágenes de los cuerpos en las diferentes vistas (Norte, Sur, Este, Oeste).
      *
-     * @param selectedBody el objeto headData seleccionado.
+     * @param selectedShield el objeto headData seleccionado.
      * @param heading la dirección en la que se debe dibujar la cabeza (0: Sur, 1: Norte, 2: Oeste, 3: Este).
      */
-    private void drawBodys(BodyData selectedBody, int heading) {
-        int[] bodies = selectedBody.getBody();
+    private void drawShields(ShieldData selectedShield, int heading) {
+        int[] bodies = selectedShield.getShield();
 
-        //Obtenemos el Grh de animación desde el indice del body + el heading
+        //Obtenemos el Grh de animación desde el indice del shield + el heading
         GrhData selectedGrh = grhDataMap.get(bodies[heading]);
 
         int nFrames = selectedGrh.getNumFrames();
