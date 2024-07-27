@@ -2,6 +2,7 @@ package org.nexus.indexador.gamedata;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.nexus.indexador.gamedata.models.BodyData;
 import org.nexus.indexador.gamedata.models.GrhData;
 import org.nexus.indexador.gamedata.models.HeadData;
 import org.nexus.indexador.gamedata.models.HelmetData;
@@ -13,11 +14,17 @@ import java.io.*;
 public class DataManager {
 
     private GrhData grhData;
+
     private ObservableList<GrhData> grhList;
+    private ObservableList<HeadData> headList;
+    private ObservableList<HelmetData> helmetList;
+    private ObservableList<BodyData> bodyList;
+
     private int GrhCount;
     private int GrhVersion;
     private short NumHeads;
     private short NumHelmets;
+    private short NumBodys;
 
     private final ConfigManager configManager;
     private final byteMigration byteMigration;
@@ -46,19 +53,22 @@ public class DataManager {
      *
      * @return Una lista observable de objetos GrhData que representan los gráficos cargados.
      */
-    public ObservableList<GrhData> getGrhList() {
-        return grhList;
-    }
+    public ObservableList<GrhData> getGrhList() { return grhList; }
+    public ObservableList<HeadData> getHeadList() { return headList; }
+    public ObservableList<HelmetData> getHelmetList() { return helmetList; }
+    public ObservableList<BodyData> getBodyList() { return bodyList; }
 
     public int getGrhCount() { return GrhCount; }
     public int getGrhVersion() {return GrhVersion;}
     public short getNumHeads() { return NumHeads; }
     public short getNumHelmets() { return NumHelmets; }
+    public short getNumBodys() { return NumBodys; }
 
     public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
     public void setGrhVersion(int GrhVersion) { this.GrhVersion = GrhVersion; }
     public void setNumHelmets(short numHelmets) { NumHelmets = numHelmets; }
     public void setNumHeads(short numHeads) { NumHeads = numHeads; }
+    public void setNumBodys(short numBodys) { NumBodys = numBodys; }
 
     /**
      * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
@@ -103,6 +113,7 @@ public class DataManager {
 
                     //Creamos un objeto de grhData usando el constructor para animación
                     GrhData grhData = new GrhData(grh, numFrames, frames, speed);
+
                     grhList.add(grhData);
 
                 } else { // Es una sola imagen
@@ -114,6 +125,7 @@ public class DataManager {
 
                     //Creamos un objeto de grhData usando el constructor para imagenes estáticas
                     GrhData grhData = new GrhData(grh, numFrames, fileNum, x, y, tileWidth, tileHeight);
+
                     grhList.add(grhData);
 
                 }
@@ -148,7 +160,7 @@ public class DataManager {
         ConfigManager configManager = ConfigManager.getInstance();
 
         // Creamos una lista observable para almacenar los gráficos leídos del archivo
-        ObservableList<HeadData> HeadList = FXCollections.observableArrayList();
+        headList = FXCollections.observableArrayList();
 
         // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
@@ -178,7 +190,7 @@ public class DataManager {
 
                 // Creamos un objeto de headData
                 HeadData headData = new HeadData(std, texture, startx, starty);
-                HeadList.add(headData);
+                headList.add(headData);
             }
 
         } catch (FileNotFoundException e) {
@@ -192,7 +204,7 @@ public class DataManager {
             System.out.println(e.getMessage());
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
-        return HeadList;
+        return headList;
     }
 
     /**
@@ -207,7 +219,7 @@ public class DataManager {
         ConfigManager configManager = ConfigManager.getInstance();
 
         // Creamos una lista observable para almacenar los gráficos leídos del archivo
-        ObservableList<HelmetData> HelmetList = FXCollections.observableArrayList();
+        helmetList = FXCollections.observableArrayList();
 
         // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
         byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
@@ -237,7 +249,7 @@ public class DataManager {
 
                 // Creamos un objeto de helmetData
                 HelmetData helmetData = new HelmetData(std, texture, startx, starty);
-                HelmetList.add(helmetData);
+                helmetList.add(helmetData);
             }
 
         } catch (FileNotFoundException e) {
@@ -251,7 +263,44 @@ public class DataManager {
             System.out.println(e.getMessage());
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
-        return HelmetList;
+        return helmetList;
+    }
+
+    public ObservableList<BodyData> readBodyFile() throws IOException {
+        ConfigManager configManager = ConfigManager.getInstance();
+
+        bodyList = FXCollections.observableArrayList();
+
+        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+        File archivo = new File(configManager.getInitDir() + "personajes.ind");
+
+        try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
+            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            file.seek(0);
+            NumBodys = byteMigration.bigToLittle_Short(file.readShort());
+
+            for (int i = 0; i < NumBodys; i++) {
+                int[] body = new int[4];
+                for (int j = 0; j < 4; j++) {
+                    body[j] = byteMigration.bigToLittle_Int(file.readInt());
+                }
+                short headOffsetX = byteMigration.bigToLittle_Short(file.readShort());
+                short headOffsetY = byteMigration.bigToLittle_Short(file.readShort());
+                BodyData data = new BodyData(body, headOffsetX, headOffsetY);
+                bodyList.add(data);
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        } catch (EOFException e) {
+            System.out.println("Fin de fichero");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+
+        return bodyList;
     }
 
 }

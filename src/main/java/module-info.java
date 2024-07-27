@@ -1,7 +1,6 @@
 module org.nexus.indexador {
     requires javafx.controls;
     requires javafx.fxml;
-    requires java.desktop;
 
     opens org.nexus.indexador to javafx.fxml;
     exports org.nexus.indexador;

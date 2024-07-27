@@ -71,24 +71,20 @@ public class frmCascos {
      * Carga los datos de los cascos desde un archivo y los muestra en la interfaz.
      */
     private void loadHelmetData() {
-        try {
-            // Llamar al método para leer el archivo binario y obtener la lista de helmetData
-            helmetList = dataManager.readHelmetFile();
+        // Llamar al método para leer el archivo binario y obtener la lista de helmetData
+        helmetList = dataManager.getHelmetList();
 
-            // Actualizar el texto de los labels con la información obtenida
-            lblNCascos.setText("Cascos cargados: " + dataManager.getNumHelmets());
+        // Actualizar el texto de los labels con la información obtenida
+        lblNCascos.setText("Cascos cargados: " + dataManager.getNumHelmets());
 
-            // Agregar los índices de gráficos al ListView
-            ObservableList<String> helmetIndices = FXCollections.observableArrayList();
-            for (int i = 1; i < helmetList.size() + 1; i++) {
-                helmetIndices.add(String.valueOf(i));
-            }
-
-            lstHelmets.setItems(helmetIndices);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Agregar los índices de gráficos al ListView
+        ObservableList<String> helmetIndices = FXCollections.observableArrayList();
+        for (int i = 1; i < helmetList.size() + 1; i++) {
+            helmetIndices.add(String.valueOf(i));
         }
+
+        lstHelmets.setItems(helmetIndices);
+
     }
 
     /**

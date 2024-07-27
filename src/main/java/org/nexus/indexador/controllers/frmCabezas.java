@@ -71,24 +71,20 @@ public class frmCabezas {
      * Carga los datos de las cabezas desde un archivo y los muestra en la interfaz.
      */
     private void loadHeadData() {
-        try {
-            // Llamar al método para leer el archivo binario y obtener la lista de headData
-            headList = dataManager.readHeadFile();
+        // Llamar al método para leer el archivo binario y obtener la lista de headData
+        headList = dataManager.getHeadList();
 
-            // Actualizar el texto de los labels con la información obtenida
-            lblNCabezas.setText("Cabezas cargadas: " + dataManager.getNumHeads());
+        // Actualizar el texto de los labels con la información obtenida
+        lblNCabezas.setText("Cabezas cargadas: " + dataManager.getNumHeads());
 
-            // Agregar los índices de gráficos al ListView
-            ObservableList<String> headIndices = FXCollections.observableArrayList();
-            for (int i = 1; i < headList.size() + 1; i++) {
-                headIndices.add(String.valueOf(i));
-            }
-
-            lstHeads.setItems(headIndices);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Agregar los índices de gráficos al ListView
+        ObservableList<String> headIndices = FXCollections.observableArrayList();
+        for (int i = 1; i < headList.size() + 1; i++) {
+            headIndices.add(String.valueOf(i));
         }
+
+        lstHeads.setItems(headIndices);
+
     }
 
     /**

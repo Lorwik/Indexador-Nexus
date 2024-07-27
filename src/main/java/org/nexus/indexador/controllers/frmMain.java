@@ -31,11 +31,12 @@ import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
 
-import java.awt.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class frmMain {
@@ -124,25 +125,35 @@ public class frmMain {
     @FXML
     private Slider sldZoom;
 
-    private ObservableList<GrhData> grhList; // Lista observable que contiene los datos de los gráficos indexados.
+    // Lista observable que contiene los datos de los gráficos indexados.
+    private ObservableList<GrhData> grhList;
 
-    private ConfigManager configManager; // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    // Clase con los datos de la animación y el mapa para la búsqueda rápida
+    private Map<Integer, GrhData> grhDataMap;
+
+    // Objeto encargado de manejar la configuración de la aplicación, incluyendo la lectura y escritura de archivos de configuración.
+    private ConfigManager configManager;
 
     private byteMigration byteMigration;
 
     private DataManager dataManager;
 
-    private static boolean consoleOpen = false; // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
+    // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
+    private static boolean consoleOpen = false;
     private static boolean headsOpen = false;
     private static boolean helmetsOpen = false;
+    private static boolean bodysOpen = false;
 
-    private int currentFrameIndex = 1; // Índice del frame actual en la animación.
+    // Índice del frame actual en la animación.
+    private int currentFrameIndex = 1;
+    // Línea de tiempo que controla la animación de los frames en el visor.
+    private Timeline animationTimeline;
 
-    private Timeline animationTimeline; // Línea de tiempo que controla la animación de los frames en el visor.
+    // Coordenadas originales del cursor del mouse en la escena al presionar el botón del mouse.
+    private double orgSceneX, orgSceneY;
 
-    private double orgSceneX, orgSceneY; // Coordenadas originales del cursor del mouse en la escena al presionar el botón del mouse.
-
-    private double orgTranslateX, orgTranslateY; // Valores de traducción originales del ImageView al arrastrar el mouse.
+    // Valores de traducción originales del ImageView al arrastrar el mouse.
+    private double orgTranslateX, orgTranslateY;
 
     /**
      * Método de inicialización del controlador. Carga los datos de gráficos y configura el ListView.
@@ -171,6 +182,14 @@ public class frmMain {
 
         // Llamar al método para leer el archivo binario y obtener la lista de grhData
         grhList = dataManager.getGrhList();
+
+        // Inicializar el mapa de grhData
+        grhDataMap = new HashMap<>();
+
+        // Llenar el mapa con los datos de grhList
+        for (GrhData grh : grhList) {
+            grhDataMap.put(grh.getGrh(), grh);
+        }
 
         // Actualizar el texto de los labels con la información obtenida
         lblIndices.setText("Indices cargados: " + dataManager.getGrhCount());
@@ -338,11 +357,16 @@ public class frmMain {
             animationTimeline.stop();
         }
 
+        currentFrameIndex = 1; // Reiniciar el índice del frame al iniciar la animación
+
         animationTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, event -> {
                     // Actualizar la imagen en el ImageView con el frame actual
                     updateFrame(selectedGrh);
                     currentFrameIndex = (currentFrameIndex + 1) % nFrames; // Avanzar al siguiente frame circularmente
+                    if (currentFrameIndex == 0) {
+                        currentFrameIndex = 1; // Omitir la posición 0
+                    }
                 }),
                 new KeyFrame(Duration.millis(100)) // Ajustar la duración según sea necesario
         );
@@ -359,30 +383,38 @@ public class frmMain {
     private void updateFrame(GrhData selectedGrh) {
         int[] frames = selectedGrh.getFrames(); // Obtener el arreglo de índices de los frames de la animación
 
-        if (currentFrameIndex > 0 && currentFrameIndex < frames.length) {
-            GrhData currentGrh = grhList.get(frames[currentFrameIndex]);
+        // Verificar que el índice actual esté dentro del rango adecuado
+        if (currentFrameIndex >= 0 && currentFrameIndex < frames.length) {
+            int frameId = frames[currentFrameIndex];
 
-            String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
+            // Buscar el GrhData correspondiente al frameId utilizando el mapa
+            GrhData currentGrh = grhDataMap.get(frameId);
 
-            File imageFile = new File(imagePath);
+            if (currentGrh != null) {
+                String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
+                File imageFile = new File(imagePath);
 
-            // ¿La imagen existe?
-            if (imageFile.exists()) {
+                // Verificar si el archivo de imagen existe
+                if (imageFile.exists()) {
+                    Image frameImage = new Image(imagePath);
 
-                Image frameImage = new Image(imagePath);
+                    // Mandar a dibujar el gráfico completo en otro ImageView
+                    drawFullImage(frameImage, selectedGrh);
 
-                //Mandamos a dibujar el grafico completo en otro ImageView
-                drawFullImage(frameImage, selectedGrh);
-
-                PixelReader pixelReader = frameImage.getPixelReader();
-                WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
-                imgIndice.setImage(croppedImage);
-
+                    PixelReader pixelReader = frameImage.getPixelReader();
+                    WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
+                    imgIndice.setImage(croppedImage);
+                } else {
+                    // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
+                    System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
+                }
             } else {
-                // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-                System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
-
+                // No se encontró el GrhData correspondiente
+                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frameId);
             }
+        } else {
+            // El índice actual está fuera del rango adecuado
+            System.out.println("updateFrame: El índice actual está fuera del rango adecuado: " + currentFrameIndex);
         }
     }
 
@@ -515,6 +547,7 @@ public class frmMain {
 
     @FXML
     private void mnuCode_OnAction() {
+        /**
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -529,6 +562,7 @@ public class frmMain {
         } else {
             System.out.println("La funcionalidad de escritorio no es compatible.");
         }
+         **/
     }
 
     @FXML
@@ -832,6 +866,29 @@ public class frmMain {
     }
 
     public void mnuBody_OnAction(ActionEvent actionEvent) {
+        if (!bodysOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Cuerpos");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmCuerpos.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                bodysOpen = true;
+
+                consoleStage.setOnCloseRequest(event -> {
+                    bodysOpen = false;
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
     }
 
     public void mnuShield_OnAction(ActionEvent actionEvent) {
