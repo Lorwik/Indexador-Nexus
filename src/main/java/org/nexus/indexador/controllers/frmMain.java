@@ -32,12 +32,7 @@ import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class frmMain {
 
@@ -64,6 +59,9 @@ public class frmMain {
 
     @FXML
     public MenuItem mnuGrhAdapter;
+
+    @FXML
+    public MenuItem mnuBuscarGrhLibres;
 
     @FXML
     public MenuItem mnuAsistente;
@@ -1064,5 +1062,75 @@ public class frmMain {
     }
 
     public void mnuExportHelmet_OnAction(ActionEvent actionEvent) {
+    }
+
+    public void mnuBuscarGrhLibres_OnAction(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Buscar Grh libres");
+        dialog.setHeaderText("Por favor, introduce cuantos Grh libres necesitas:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(value -> {
+            try {
+                int numGrhLibres = Integer.parseInt(value);
+
+                if (numGrhLibres < 1) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Número inválido");
+                    alert.setContentText("Por favor, introduce un número mayor o igual a 1.");
+                    alert.showAndWait();
+                    return;
+                }
+
+                 int grhLibres = buscarGrhLibres(numGrhLibres);
+
+                if (grhLibres == 0) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("No se encontraron Grh libres");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No se encontraron secuencias de " + grhLibres + " Grh libres.");
+                    alert.showAndWait();
+                } else {
+                    StringBuilder mensaje = new StringBuilder("Se encontraron secuencias de Grh libres desde Grh" + (grhLibres - (numGrhLibres - 1)) + " hasta Grh" + grhLibres);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Grh libres encontrados");
+                    alert.setHeaderText(null);
+                    alert.setContentText(mensaje.toString());
+                    alert.showAndWait();
+                }
+            } catch (NumberFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Entrada inválida");
+                alert.setContentText("Por favor, introduce un número válido.");
+                alert.showAndWait();
+            }
+        });
+    }
+
+    private int buscarGrhLibres(int numGrhLibres) {
+        int contador = 0;
+
+        // Buscar secuencias de Grh libres en grhList
+        for (int i = 1; i < dataManager.getGrhCount(); i++) {
+            GrhData currentGrh = grhDataMap.get(i);
+
+            if (currentGrh == null) { // Determina si el Grh está libre
+                contador++;
+
+                if (contador == numGrhLibres) {
+
+                    return i;
+
+                }
+            } else {
+                contador = 0;
+            }
+        }
+
+        return 0;
+
     }
 }

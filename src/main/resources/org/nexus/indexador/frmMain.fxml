@@ -61,6 +61,7 @@
               <items>
                 <MenuItem id="mnuGrhAdapter" fx:id="mnuGrhAdapter" mnemonicParsing="false" onAction="#mnuGrhAdapter_OnAction" text="Adaptador de Grh" />
                   <MenuItem id="mnuGrhAdapter" fx:id="mnuAsistente" mnemonicParsing="false" onAction="#mnuAsistente_OnAction" text="Asistente" />
+                  <MenuItem id="mnuGrhAdapter" fx:id="mnuBuscarGrhLibres" mnemonicParsing="false" onAction="#mnuBuscarGrhLibres_OnAction" text="Buscar Grh Libres" />
               </items>
             </Menu>
                 <Menu fx:id="mnuHelp" mnemonicParsing="false" text="Ayuda">
