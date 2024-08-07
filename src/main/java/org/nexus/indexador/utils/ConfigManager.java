@@ -9,6 +9,7 @@ public class ConfigManager {
 
     private String graphicsDir;
     private String initDir;
+    private String datDir;
     private String exportDir;
 
     private static final String CONFIG_FILE_NAME = "config.ini";
@@ -26,11 +27,13 @@ public class ConfigManager {
     // Getters
     public String getGraphicsDir() { return graphicsDir; }
     public String getInitDir() { return initDir; }
+    public String getDatDir() { return datDir; }
     public String getExportDir() { return exportDir; }
 
     // Setters
     public void setGraphicsDir(String graphicsDir) { this.graphicsDir = graphicsDir; }
     public void setInitDir(String initDir) { this.initDir = initDir; }
+    public void setDatDir(String datDir) { this.datDir = datDir; }
     public void setExportDir(String exportDir) { this.exportDir = exportDir; }
 
     public void readConfig() throws IOException {
@@ -48,6 +51,8 @@ public class ConfigManager {
                             graphicsDir = value;
                         } else if (key.equals("Init")) {
                             initDir = value;
+                        } else if (key.equals("Dat")) {
+                            datDir = value;
                         } else if (key.equals("Exportados")) {
                             exportDir = value;
                         }
@@ -69,6 +74,8 @@ public class ConfigManager {
             writer.write("Graficos=" + graphicsDir);
             writer.newLine();
             writer.write("Init=" + initDir);
+            writer.newLine();
+            writer.write("Dat=" + datDir);
             writer.newLine();
             writer.write("Exportados=" + exportDir);
         }

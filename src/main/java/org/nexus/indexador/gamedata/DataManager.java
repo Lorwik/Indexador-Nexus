@@ -3,6 +3,7 @@ package org.nexus.indexador.gamedata;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.nexus.indexador.gamedata.models.*;
+import org.nexus.indexador.utils.DatEditor;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
 
@@ -26,19 +27,20 @@ public class DataManager {
     private short NumBodys;
     private short NumShields;
     private short NumFXs;
+    private short NumObjs;
 
     private final ConfigManager configManager;
     private final byteMigration byteMigration;
+    private final DatEditor datEditor;
 
     private static DataManager instance;
 
     private DataManager() throws IOException {
 
-        // Obtenemos una instancia de configManager
+        // Obtenemos instancias:
         configManager = ConfigManager.getInstance();
-
-        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
         byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
+        datEditor = DatEditor.getInstance();
 
     }
 
@@ -68,6 +70,7 @@ public class DataManager {
     public short getNumBodys() { return NumBodys; }
     public short getNumShields() { return NumShields; }
     public short getNumFXs() { return NumFXs; }
+    public short getNumObjs() { return NumObjs; }
 
     public void setGrhCount(int GrhCount) { this.GrhCount = GrhCount; }
     public void setGrhVersion(int GrhVersion) { this.GrhVersion = GrhVersion; }
@@ -75,7 +78,8 @@ public class DataManager {
     public void setNumHeads(short numHeads) { NumHeads = numHeads; }
     public void setNumBodys(short numBodys) { NumBodys = numBodys; }
     public void setNumShields(short numShields) { NumShields = numShields; }
-    public void setNumFXs(short numFXs) { NumShields = numFXs; }
+    public void setNumFXs(short numFXs) { NumFXs = numFXs; }
+    public void setNumObjs(short numObjs) { NumObjs = numObjs; }
 
     /**
      * Lee los datos de un archivo binario que contiene información sobre gráficos (grh) y los convierte en objetos grhData.
