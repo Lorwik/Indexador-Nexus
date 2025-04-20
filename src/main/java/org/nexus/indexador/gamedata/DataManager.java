@@ -6,6 +6,7 @@ import org.nexus.indexador.gamedata.models.*;
 import org.nexus.indexador.utils.DatEditor;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
+import org.nexus.indexador.utils.Logger;
 
 import java.io.*;
 
@@ -32,6 +33,7 @@ public class DataManager {
     private final ConfigManager configManager;
     private final byteMigration byteMigration;
     private final DatEditor datEditor;
+    private final Logger logger;
 
     private static DataManager instance;
 
@@ -41,7 +43,9 @@ public class DataManager {
         configManager = ConfigManager.getInstance();
         byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         datEditor = DatEditor.getInstance();
+        logger = Logger.getInstance();
 
+        logger.info("DataManager inicializado");
     }
 
     public static DataManager getInstance() throws IOException {
@@ -90,7 +94,7 @@ public class DataManager {
      */
     public ObservableList<GrhData> loadGrhData() throws IOException {
 
-        System.out.println("Ejecutando LoadGrhData.");
+        logger.info("Ejecutando LoadGrhData.");
 
         grhList = FXCollections.observableArrayList();
 
@@ -98,7 +102,7 @@ public class DataManager {
         File archivo = new File(configManager.getInitDir() + "graficos.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
 
             //Nos posicionamos al inicio del fichero
             file.seek(0);
@@ -145,17 +149,19 @@ public class DataManager {
                 if (file.getFilePointer() == file.length()) break;
             }
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
 
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
 
         }
+        
+        logger.info("Loaded " + grhList.size() + " gráficos exitosamente");
         return grhList;
     }
 
@@ -167,20 +173,16 @@ public class DataManager {
      */
     public ObservableList<HeadData> readHeadFile() throws IOException {
 
-        // Obtenemos una instancia de configManager
-        ConfigManager configManager = ConfigManager.getInstance();
-
+        logger.info("Cargando datos de cabezas...");
+        
         // Creamos una lista observable para almacenar los gráficos leídos del archivo
         headList = FXCollections.observableArrayList();
-
-        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
         // Creamos un objeto File para el archivo que contiene los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "head.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
 
             // Nos posicionamos al inicio del fichero
             file.seek(0);
@@ -205,16 +207,18 @@ public class DataManager {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
 
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
+        
+        logger.info("Cargadas " + headList.size() + " cabezas exitosamente");
         return headList;
     }
 
@@ -226,20 +230,16 @@ public class DataManager {
      */
     public ObservableList<HelmetData> readHelmetFile() throws IOException {
 
-        // Obtenemos una instancia de configManager
-        ConfigManager configManager = ConfigManager.getInstance();
-
+        logger.info("Cargando datos de cascos...");
+        
         // Creamos una lista observable para almacenar los gráficos leídos del archivo
         helmetList = FXCollections.observableArrayList();
-
-        // Obtenemos una instancia de byteMigration para realizar la conversión de bytes
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
 
         // Creamos un objeto File para el archivo que contiene los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "helmet.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
 
             // Nos posicionamos al inicio del fichero
             file.seek(0);
@@ -264,29 +264,30 @@ public class DataManager {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
 
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
+        
+        logger.info("Cargados " + helmetList.size() + " cascos exitosamente");
         return helmetList;
     }
 
     public ObservableList<BodyData> readBodyFile() throws IOException {
-        ConfigManager configManager = ConfigManager.getInstance();
-
+        logger.info("Cargando datos de cuerpos...");
+        
         bodyList = FXCollections.observableArrayList();
 
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         File archivo = new File(configManager.getInitDir() + "personajes.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
             file.seek(0);
             NumBodys = byteMigration.bigToLittle_Short(file.readShort());
 
@@ -302,28 +303,28 @@ public class DataManager {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e;
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e;
         }
 
+        logger.info("Cargados " + bodyList.size() + " cuerpos exitosamente");
         return bodyList;
     }
 
     public ObservableList<ShieldData> readShieldFile() throws IOException {
-        ConfigManager configManager = ConfigManager.getInstance();
-
+        logger.info("Cargando datos de escudos...");
+        
         shieldList = FXCollections.observableArrayList();
 
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         File archivo = new File(configManager.getInitDir() + "escudos.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
             file.seek(0);
             NumShields = byteMigration.bigToLittle_Short(file.readShort());
 
@@ -337,28 +338,28 @@ public class DataManager {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e;
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e;
         }
 
+        logger.info("Cargados " + shieldList.size() + " escudos exitosamente");
         return shieldList;
     }
 
     public ObservableList<FXData> readFXsdFile() throws IOException {
-        ConfigManager configManager = ConfigManager.getInstance();
-
+        logger.info("Cargando datos de FXs...");
+        
         fxList = FXCollections.observableArrayList();
 
-        byteMigration byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         File archivo = new File(configManager.getInitDir() + "FXs.ind");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "r")) {
-            System.out.println("Comenzando a leer desde " + archivo.getAbsolutePath());
+            logger.info("Comenzando a leer desde " + archivo.getAbsolutePath());
             file.seek(0);
             NumFXs = byteMigration.bigToLittle_Short(file.readShort());
 
@@ -374,15 +375,16 @@ public class DataManager {
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Archivo no encontrado: " + archivo.getAbsolutePath(), e);
             throw e;
         } catch (EOFException e) {
-            System.out.println("Fin de fichero");
+            logger.info("Fin de fichero alcanzado");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error de E/S al leer el archivo: " + archivo.getAbsolutePath(), e);
             throw e;
         }
 
+        logger.info("Cargados " + fxList.size() + " FXs exitosamente");
         return fxList;
     }
 

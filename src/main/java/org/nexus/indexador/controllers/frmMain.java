@@ -30,6 +30,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.nexus.indexador.utils.byteMigration;
 import org.nexus.indexador.utils.ConfigManager;
+import org.nexus.indexador.utils.ImageCache;
+import org.nexus.indexador.utils.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -135,8 +137,13 @@ public class frmMain {
     private byteMigration byteMigration;
 
     private DataManager dataManager;
+    
+    // Caché de imágenes para optimizar la carga y uso de recursos
+    private ImageCache imageCache;
+    
+    // Logger para registro de eventos
+    private Logger logger;
 
-    // Variable booleana que indica si la ventana de la consola está abierta o cerrada.
     private static boolean consoleOpen = false;
     private static boolean headsOpen = false;
     private static boolean helmetsOpen = false;
@@ -165,11 +172,17 @@ public class frmMain {
         configManager = ConfigManager.getInstance();
         byteMigration = org.nexus.indexador.utils.byteMigration.getInstance();
         dataManager = org.nexus.indexador.gamedata.DataManager.getInstance();
+        imageCache = ImageCache.getInstance();
+        logger = Logger.getInstance();
+        
+        logger.info("Inicializando controlador frmMain");
 
         loadGrh();
         setupGrhListListener();
         setupFilterTextFieldListener();
         setupSliderZoom();
+        
+        logger.info("Controlador frmMain inicializado correctamente");
     }
 
     /**
@@ -181,31 +194,37 @@ public class frmMain {
     private void loadGrh() {
 
         // Llamar al método para leer el archivo binario y obtener la lista de grhData
-        grhList = dataManager.getGrhList();
-
-        // Inicializar el mapa de grhData
-        grhDataMap = new HashMap<>();
-
-        // Llenar el mapa con los datos de grhList
-        for (GrhData grh : grhList) {
-            grhDataMap.put(grh.getGrh(), grh);
-        }
-
-        // Actualizar el texto de los labels con la información obtenida
-        lblIndices.setText("Indices cargados: " + dataManager.getGrhCount());
-        lblVersion.setText("Versión de Indices: " + dataManager.getGrhVersion());
-
-        // Agregar los índices de gráficos al ListView
-        ObservableList<String> grhIndices = FXCollections.observableArrayList();
-        for (GrhData grh : grhList) {
-            String indice = String.valueOf(grh.getGrh());
-            if (grh.getNumFrames() > 1) {
-                indice += " (Animación)"; // Agregar indicación de animación
+        try {
+            grhList = dataManager.loadGrhData();
+            
+            // Inicializar el mapa de grhData
+            grhDataMap = new HashMap<>();
+    
+            // Llenar el mapa con los datos de grhList
+            for (GrhData grh : grhList) {
+                grhDataMap.put(grh.getGrh(), grh);
             }
-            grhIndices.add(indice);
+    
+            // Actualizar el texto de los labels con la información obtenida
+            lblIndices.setText("Indices cargados: " + dataManager.getGrhCount());
+            lblVersion.setText("Versión de Indices: " + dataManager.getGrhVersion());
+    
+            // Agregar los índices de gráficos al ListView
+            ObservableList<String> grhIndices = FXCollections.observableArrayList();
+            for (GrhData grh : grhList) {
+                String indice = String.valueOf(grh.getGrh());
+                if (grh.getNumFrames() > 1) {
+                    indice += " (Animación)"; // Agregar indicación de animación
+                }
+                grhIndices.add(indice);
+            }
+            lstIndices.setItems(grhIndices);
+            
+            logger.info("Gráficos cargados correctamente: " + grhList.size() + " índices");
+            
+        } catch (IOException e) {
+            logger.error("Error al cargar los datos de gráficos", e);
         }
-        lstIndices.setItems(grhIndices);
-
     }
 
     /**
@@ -311,36 +330,37 @@ public class frmMain {
     private void displayStaticImage(GrhData selectedGrh) {
         // Construir la ruta completa de la imagen para imagePath
         String imagePath = configManager.getGraphicsDir() + selectedGrh.getFileNum() + ".png";
-        File imageFile = new File(imagePath);
-
-        // ¿La imagen existe?
-        if (imageFile.exists()) {
-
-            // El archivo existe, cargar la imagen
-            Image staticImage = new Image(imageFile.toURI().toString());
-
-            //Mandamos a dibujar el grafico completo en otro ImageView
+        
+        // Usar el caché de imágenes para obtener la imagen
+        Image staticImage = imageCache.getImage(imagePath);
+        
+        if (staticImage != null) {
+            // Mandamos a dibujar el grafico completo en otro ImageView
             drawFullImage(staticImage, selectedGrh);
-
-            // Recortar la región adecuada de la imagen completa
-            PixelReader pixelReader = staticImage.getPixelReader();
-            WritableImage croppedImage = new WritableImage(pixelReader, selectedGrh.getsX(), selectedGrh.getsY(), selectedGrh.getTileWidth(), selectedGrh.getTileHeight());
-
-            // Establecer el tamaño preferido del ImageView para que coincida con el tamaño de la imagen
-            imgIndice.setFitWidth(selectedGrh.getTileWidth()); // Ancho de la imagen
-            imgIndice.setFitHeight(selectedGrh.getTileHeight()); // Alto de la imagen
-
-            // Desactivar la preservación de la relación de aspecto
-            imgIndice.setPreserveRatio(false);
-
-            // Mostrar la región recortada en el ImageView
-            imgIndice.setImage(croppedImage);
-
+            
+            // Obtener la imagen recortada del caché
+            WritableImage croppedImage = imageCache.getCroppedImage(
+                imagePath, 
+                selectedGrh.getsX(), 
+                selectedGrh.getsY(), 
+                selectedGrh.getTileWidth(), 
+                selectedGrh.getTileHeight()
+            );
+            
+            if (croppedImage != null) {
+                // Establecer el tamaño preferido del ImageView para que coincida con el tamaño de la imagen
+                imgIndice.setFitWidth(selectedGrh.getTileWidth()); // Ancho de la imagen
+                imgIndice.setFitHeight(selectedGrh.getTileHeight()); // Alto de la imagen
+                
+                // Desactivar la preservación de la relación de aspecto
+                imgIndice.setPreserveRatio(false);
+                
+                // Mostrar la región recortada en el ImageView
+                imgIndice.setImage(croppedImage);
+            }
         } else {
-            // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-            System.out.println("displayStaticImage: El archivo de imagen no existe: " + imagePath);
+            logger.warning("No se encontró la imagen: " + imagePath);
         }
-
     }
 
     /**
@@ -392,281 +412,117 @@ public class frmMain {
 
             if (currentGrh != null) {
                 String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
-                File imageFile = new File(imagePath);
-
-                // Verificar si el archivo de imagen existe
-                if (imageFile.exists()) {
-                    Image frameImage = new Image(imageFile.toURI().toString());
-
+                
+                // Obtener imagen desde el caché
+                Image frameImage = imageCache.getImage(imagePath);
+                
+                if (frameImage != null) {
                     // Mandar a dibujar el gráfico completo en otro ImageView
-                    drawFullImage(frameImage, selectedGrh);
-
-                    PixelReader pixelReader = frameImage.getPixelReader();
-                    WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
-                    imgIndice.setImage(croppedImage);
+                    drawFullImage(frameImage, currentGrh);
+                    
+                    // Obtener subimagen recortada desde el caché
+                    WritableImage croppedImage = imageCache.getCroppedImage(
+                        imagePath,
+                        currentGrh.getsX(),
+                        currentGrh.getsY(),
+                        currentGrh.getTileWidth(),
+                        currentGrh.getTileHeight()
+                    );
+                    
+                    if (croppedImage != null) {
+                        // Mostrar la región recortada en el ImageView
+                        imgIndice.setImage(croppedImage);
+                    }
                 } else {
-                    // El archivo no existe, mostrar un mensaje de error o registrar un mensaje de advertencia
-                    System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
+                    logger.warning("No se encontró la imagen: " + imagePath);
                 }
             } else {
-                // No se encontró el GrhData correspondiente
-                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frameId);
+                logger.warning("No se encontró el GrhData correspondiente para frameId: " + frameId);
             }
         } else {
-            // El índice actual está fuera del rango adecuado
-            System.out.println("updateFrame: El índice actual está fuera del rango adecuado: " + currentFrameIndex);
+            logger.warning("El índice actual está fuera del rango adecuado: " + currentFrameIndex);
         }
     }
 
     /**
-     * Dibuja la imagen completa del gráfico en el ImageView y dibuja un rectángulo alrededor de la región del índice.
+     * Dibuja un rectángulo alrededor de la región del índice seleccionado en la imagen completa del gráfico.
      *
-     * @param grhImage    La imagen completa del gráfico.
      * @param selectedGrh El gráfico seleccionado que contiene la información de la región del índice.
      */
-    private void drawFullImage(Image grhImage, GrhData selectedGrh) {
-        // Dibuja la imagen completa del gráfico en el ImageView
-        imgGrafico.setImage(grhImage);
-
-        // Dibuja un rectángulo alrededor de la región del índice en la imagen completa del gráfico
-        drawRectangle(selectedGrh);
-    }
-
-    /**
-     * Dibuja un rectángulo alrededor de la región específica del gráfico en el ImageView.
-     *
-     * @param selectedGrh El gráfico seleccionado.
-     */
     private void drawRectangle(GrhData selectedGrh) {
-        // Obtener las dimensiones del ImageView imgGrafico
-        double imgWidth = imgGrafico.getBoundsInLocal().getWidth();
-        double imgHeight = imgGrafico.getBoundsInLocal().getHeight();
-
-        // Obtener las coordenadas del rectángulo en relación con las coordenadas del ImageView
-        double rectX = (selectedGrh.getsX() * imgWidth) / imgGrafico.getImage().getWidth() + 5;
-        double rectY = (selectedGrh.getsY() * imgHeight) / imgGrafico.getImage().getHeight() + 5;
-        double rectWidth = (selectedGrh.getTileWidth() * imgWidth) / imgGrafico.getImage().getWidth();
-        double rectHeight = (selectedGrh.getTileHeight() * imgHeight) / imgGrafico.getImage().getHeight();
-
-        // Configurar las propiedades del rectángulo
-        rectanguloIndice.setX(rectX);
-        rectanguloIndice.setY(rectY);
-        rectanguloIndice.setWidth(rectWidth);
-        rectanguloIndice.setHeight(rectHeight);
-    }
-
-    /**
-     * Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
-     */
-    @FXML
-    private void mnuConsola_OnAction() {
-        if (!consoleOpen) {
-            // Crea la nueva ventana
-            Stage consoleStage = new Stage();
-            consoleStage.setTitle("Consola");
-
-            // Lee el archivo FXML para la ventana
-            try {
-                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmConsola.fxml"));
-                consoleStage.setScene(new Scene(consoleRoot));
-                consoleStage.setResizable(false);
-                consoleStage.show();
-
-                consoleOpen = true; // Actualiza el estado para indicar que la ventana de la consola está abierta
-
-                // Listener para detectar cuándo se cierra la ventana de la consola
-                consoleStage.setOnCloseRequest(event -> {
-                    consoleOpen = false; // Actualiza el estado cuando se cierra la ventana de la consola
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        }
-    }
-
-    /**
-     * Exporta los datos de gráficos al archivo "graficos.ini" en el directorio de exportación configurado.
-     * Los datos exportados incluyen el número total de gráficos, la versión de los índices y la información detallada de cada gráfico.
-     * Si se produce algún error durante el proceso de exportación, se imprime un mensaje de error.
-     */
-    @FXML
-    private void mnuExportGrh_OnAction() {
-
-        File file = new File(configManager.getExportDir() + "graficos.ini");
-
-        System.out.println("Exportando indices, espera...");
-
-        try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
-            bufferWriter.write("[INIT]");
-            bufferWriter.newLine();
-            bufferWriter.write("NumGrh=" + dataManager.getGrhCount());
-            bufferWriter.newLine();
-            bufferWriter.write("Version=" + dataManager.getGrhVersion());
-            bufferWriter.newLine();
-            bufferWriter.write("[GRAPHICS]");
-            bufferWriter.newLine();
-
-            for (GrhData grh : grhList) {
-                if (grh.getNumFrames() > 1) {
-                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-");
-
-                    int[] frames = grh.getFrames();
-
-                    for (int i = 1; i < grh.getNumFrames() + 1; i++) {
-                        bufferWriter.write(frames[i] + "-");
-                    }
-
-                    bufferWriter.write(String.valueOf(grh.getSpeed()));
-
-                } else {
-                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-" +
-                            grh.getFileNum() + "-" + grh.getsX() + "-" + grh.getsY() + "-" +
-                            grh.getTileWidth() + "-" + grh.getTileHeight());
-                }
-                bufferWriter.newLine();
-
-            }
-
-            System.out.println("Indices exportados!");
-
-        } catch (IOException e) {
-            // Manejar la excepción de manera adecuada, proporcionando un mensaje de error útil para el usuario
-            System.err.println("Error al exportar los datos de gráficos: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Cierra la aplicación
-     */
-    @FXML
-    private void mnuClose_OnAction() {
-        Platform.exit();
-    }
-
-    @FXML
-    private void mnuCode_OnAction() {
-        /**
-        if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
-            if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    desktop.browse(new URI("https://github.com/Lorwik/Indexador-Nexus"));
-                } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.out.println("El navegador web no es compatible.");
-            }
-        } else {
-            System.out.println("La funcionalidad de escritorio no es compatible.");
-        }
-         **/
-    }
-
-    @FXML
-    private void mnuGrhAdapter_OnAction() {
-        // Crea la nueva ventana
-        Stage consoleStage = new Stage();
-        consoleStage.setTitle("Adaptador de Grh");
-
-        // Lee el archivo FXML para la ventana
         try {
-            Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmAdaptador.fxml"));
-            consoleStage.setScene(new Scene(consoleRoot));
-            consoleStage.setResizable(false);
-            consoleStage.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-    }
-
-    /**
-     * Guarda los cambios realizados en los datos del gráfico seleccionado en la lista.
-     * Obtiene el índice seleccionado de la lista y actualiza los atributos del objeto grhData correspondiente con los valores ingresados en los campos de texto.
-     * Si no hay ningún índice seleccionado, no se realizan cambios.
-     * Se imprime un mensaje indicando que los cambios se han aplicado con éxito.
-     */
-    @FXML
-    private void saveGrhData() {
-        // Obtenemos el índice seleccionado en la lista:
-        int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
-
-        // Nos aseguramos de que el índice es válido
-        if (selectedIndex >= 0) {
-            // Obtenemos el objeto grhData correspondiente al índice seleccionado
-            GrhData selectedGrh = grhList.get(selectedIndex);
-
-            // Comenzamos aplicar los cambios:
-            selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
-            selectedGrh.setsX(Short.parseShort(txtPosX.getText()));
-            selectedGrh.setsY(Short.parseShort(txtPosY.getText()));
-            selectedGrh.setTileWidth(Short.parseShort(txtAncho.getText()));
-            selectedGrh.setTileHeight(Short.parseShort(txtAlto.getText()));
-
-            System.out.println(("Cambios aplicados!"));
-
-        }
-    }
-
-    /**
-     * Configura un listener para el TextField de filtro para detectar cambios en su contenido.
-     */
-    private void setupFilterTextFieldListener() {
-        // Agregar un listener al TextField de filtro para detectar cambios en su contenido
-        txtFiltro.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterIndices(newValue); // Llamar al método para filtrar los índices
-        });
-    }
-
-    /**
-     * Filtra los índices en el ListView según el texto proporcionado.
-     *
-     * @param filterText El texto utilizado para filtrar los índices.
-     */
-    private void filterIndices(String filterText) {
-        if (!filterText.isEmpty()) {
-            // El texto de filtro no está vacío
-            try {
-                int filterIndex = Integer.parseInt(filterText);
-
-                // Buscar el índice en la lista de índices
-                for (int i = 0; i < grhList.size(); i++) {
-                    if (grhList.get(i).getGrh() == filterIndex) {
-                        // Seleccionar el índice correspondiente en el ListView
-                        lstIndices.getSelectionModel().select(i);
-                        lstIndices.scrollTo(i); // Desplazar el ListView para mostrar el índice seleccionado
-                        return; // Salir del bucle una vez que se encuentre el índice
-                    }
-                }
-
-                // Si no se encuentra el índice, limpiar la selección en el ListView
-                lstIndices.getSelectionModel().clearSelection();
-
-            } catch (NumberFormatException e) {
-                // En caso de que el texto de filtro no sea un número, no hacer nada
+            // Verificar que la imagen esté cargada
+            if (imgGrafico.getImage() == null) {
+                return;
             }
-        } else {
-            // Si el texto de filtro está vacío, limpiar la selección en el ListView
-            lstIndices.getSelectionModel().clearSelection();
+
+            // Obtener las dimensiones del ImageView imgGrafico
+            double imgViewWidth = imgGrafico.getFitWidth();
+            double imgViewHeight = imgGrafico.getFitHeight();
+
+            if (imgViewWidth == 0) imgViewWidth = imgGrafico.getBoundsInLocal().getWidth();
+            if (imgViewHeight == 0) imgViewHeight = imgGrafico.getBoundsInLocal().getHeight();
+
+            // Obtener las dimensiones de la imagen original
+            double originalWidth = imgGrafico.getImage().getWidth();
+            double originalHeight = imgGrafico.getImage().getHeight();
+
+            // Calcular la escala entre el ImageView y la imagen original
+            double scaleX = imgViewWidth / originalWidth;
+            double scaleY = imgViewHeight / originalHeight;
+
+            // Si la imagen se está ajustando para preservar la relación, usar la escala más pequeña
+            if (imgGrafico.isPreserveRatio()) {
+                double scale = Math.min(scaleX, scaleY);
+                scaleX = scale;
+                scaleY = scale;
+            }
+
+            // Obtener las coordenadas del rectángulo en relación con las coordenadas del ImageView
+            double rectX = selectedGrh.getsX() * scaleX + 5;
+            double rectY = selectedGrh.getsY() * scaleY + 5;
+            double rectWidth = selectedGrh.getTileWidth() * scaleX;
+            double rectHeight = selectedGrh.getTileHeight() * scaleY;
+
+            // Si la imagen está centrada en el ImageView, ajustar las coordenadas
+            double xOffset = (imgViewWidth - (originalWidth * scaleX)) / 2 ;
+            double yOffset = (imgViewHeight - (originalHeight * scaleY)) / 2;
+
+            if (xOffset > 0) rectX += xOffset;
+            if (yOffset > 0) rectY += yOffset;
+
+            // Configurar las propiedades del rectángulo
+            rectanguloIndice.setX(rectX);
+            rectanguloIndice.setY(rectY);
+            rectanguloIndice.setWidth(rectWidth);
+            rectanguloIndice.setHeight(rectHeight);
+            rectanguloIndice.setVisible(true);
+
+            logger.debug("Rectángulo dibujado en: x=" + rectX + ", y=" + rectY +
+                         ", ancho=" + rectWidth + ", alto=" + rectHeight +
+                         ", escala: " + scaleX + "x" + scaleY);
+        } catch (Exception e) {
+            logger.error("Error al dibujar el rectángulo", e);
         }
     }
 
     /**
-     * Configura el deslizador de zoom.
-     * Este método configura un listener para el deslizador de zoom, que ajusta la escala del ImageView
-     * según el valor del deslizador.
+     * Dibuja la imagen completa en un ImageView para visualización y coloca un rectángulo 
+     * alrededor de la región específica que representa el gráfico.
+     *
+     * @param image La imagen a dibujar.
+     * @param grh   El objeto GrhData que contiene la información sobre la imagen.
      */
-    private void setupSliderZoom() {
-        sldZoom.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double zoomValue = newValue.doubleValue();
-            // Aplica la escala al ImageView
-            imgIndice.setScaleX(zoomValue);
-            imgIndice.setScaleY(zoomValue);
-        });
+    private void drawFullImage(Image image, GrhData grh) {
+        try {
+            // Establecer la imagen completa en el ImageView
+            imgGrafico.setImage(image);
+            
+            // Dibujar el rectángulo que marca la región del gráfico
+            drawRectangle(grh);
+        } catch (Exception e) {
+            logger.error("Error al dibujar la imagen completa", e);
+        }
     }
 
     /**
@@ -706,6 +562,198 @@ public class frmMain {
             ((ImageView) (event.getSource())).setTranslateX(newTranslateX);
             ((ImageView) (event.getSource())).setTranslateY(newTranslateY);
         }
+    }
+
+    /**
+     * Método para manejar la acción cuando se hace clic en el elemento del menú "Consola"
+     */
+    @FXML
+    private void mnuConsola_OnAction() {
+        if (!consoleOpen) {
+            // Crea la nueva ventana
+            Stage consoleStage = new Stage();
+            consoleStage.setTitle("Consola");
+
+            // Lee el archivo FXML para la ventana
+            try {
+                Parent consoleRoot = FXMLLoader.load(Main.class.getResource("frmConsola.fxml"));
+                consoleStage.setScene(new Scene(consoleRoot));
+                consoleStage.setResizable(false);
+                consoleStage.show();
+
+                consoleOpen = true; // Actualiza el estado para indicar que la ventana de la consola está abierta
+
+                // Listener para detectar cuándo se cierra la ventana de la consola
+                consoleStage.setOnCloseRequest(event -> {
+                    consoleOpen = false; // Actualiza el estado cuando se cierra la ventana de la consola
+                });
+
+            } catch (Exception e) {
+                logger.error("Error al abrir la ventana de la consola", e);
+            }
+        }
+    }
+
+    /**
+     * Exporta los datos de gráficos al archivo "graficos.ini" en el directorio de exportación configurado.
+     * Los datos exportados incluyen el número total de gráficos, la versión de los índices y la información detallada de cada gráfico.
+     * Si se produce algún error durante el proceso de exportación, se imprime un mensaje de error.
+     */
+    @FXML
+    private void mnuExportGrh_OnAction() {
+
+        File file = new File(configManager.getExportDir() + "graficos.ini");
+
+        logger.info("Exportando indices, espera...");
+
+        try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
+            bufferWriter.write("[INIT]");
+            bufferWriter.newLine();
+            bufferWriter.write("NumGrh=" + dataManager.getGrhCount());
+            bufferWriter.newLine();
+            bufferWriter.write("Version=" + dataManager.getGrhVersion());
+            bufferWriter.newLine();
+            bufferWriter.write("[GRAPHICS]");
+            bufferWriter.newLine();
+
+            for (GrhData grh : grhList) {
+                if (grh.getNumFrames() > 1) {
+                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-");
+
+                    int[] frames = grh.getFrames();
+
+                    for (int i = 1; i < grh.getNumFrames() + 1; i++) {
+                        bufferWriter.write(frames[i] + "-");
+                    }
+
+                    bufferWriter.write(String.valueOf(grh.getSpeed()));
+
+                } else {
+                    bufferWriter.write("Grh" + grh.getGrh() + "=" + grh.getNumFrames() + "-" +
+                            grh.getFileNum() + "-" + grh.getsX() + "-" + grh.getsY() + "-" +
+                            grh.getTileWidth() + "-" + grh.getTileHeight());
+                }
+                bufferWriter.newLine();
+
+            }
+
+            logger.info("Indices exportados!");
+
+        } catch (IOException e) {
+            logger.error("Error al exportar los datos de gráficos", e);
+        }
+    }
+
+    /**
+     * Cierra la aplicación
+     */
+    @FXML
+    private void mnuClose_OnAction() {
+        Platform.exit();
+    }
+
+    @FXML
+    private void mnuCode_OnAction() {
+        /**
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/Lorwik/Indexador-Nexus"));
+                } catch (IOException | URISyntaxException e) {
+                    logger.error("Error al abrir el enlace", e);
+                }
+            } else {
+                logger.warning("El navegador web no es compatible.");
+            }
+        } else {
+            logger.warning("La funcionalidad de escritorio no es compatible.");
+        }
+         **/
+    }
+
+    /**
+     * Guarda los cambios realizados en los datos del gráfico seleccionado en la lista.
+     * Obtiene el índice seleccionado de la lista y actualiza los atributos del objeto grhData correspondiente con los valores ingresados en los campos de texto.
+     * Si no hay ningún índice seleccionado, no se realizan cambios.
+     * Se imprime un mensaje indicando que los cambios se han aplicado con éxito.
+     */
+    @FXML
+    private void saveGrhData() {
+        // Obtenemos el índice seleccionado en la lista:
+        int selectedIndex = lstIndices.getSelectionModel().getSelectedIndex();
+
+        // Nos aseguramos de que el índice es válido
+        if (selectedIndex >= 0) {
+            // Obtenemos el objeto grhData correspondiente al índice seleccionado
+            GrhData selectedGrh = grhList.get(selectedIndex);
+
+            // Comenzamos aplicar los cambios:
+            selectedGrh.setFileNum(Integer.parseInt(txtImagen.getText()));
+            selectedGrh.setsX(Short.parseShort(txtPosX.getText()));
+            selectedGrh.setsY(Short.parseShort(txtPosY.getText()));
+            selectedGrh.setTileWidth(Short.parseShort(txtAncho.getText()));
+            selectedGrh.setTileHeight(Short.parseShort(txtAlto.getText()));
+
+            logger.info("Cambios aplicados!");
+        }
+    }
+
+    /**
+     * Configura un listener para el TextField de filtro para detectar cambios en su contenido.
+     */
+    private void setupFilterTextFieldListener() {
+        // Agregar un listener al TextField de filtro para detectar cambios en su contenido
+        txtFiltro.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterIndices(newValue); // Llamar al método para filtrar los índices
+        });
+    }
+
+    /**
+     * Filtra los índices en el ListView según el texto proporcionado.
+     *
+     * @param filterText El texto utilizado para filtrar los índices.
+     */
+    private void filterIndices(String filterText) {
+        if (!filterText.isEmpty()) {
+            // El texto de filtro no está vacío
+            try {
+                int filterIndex = Integer.parseInt(filterText);
+
+                // Buscar el índice en la lista de índices
+                for (int i = 0; i < grhList.size(); i++) {
+                    if (grhList.get(i).getGrh() == filterIndex) {
+                        // Seleccionar el índice correspondiente en el ListView
+                        lstIndices.getSelectionModel().select(i);
+                        lstIndices.scrollTo(i); // Desplazar el ListView para mostrar el índice seleccionado
+                        return; // Salir del bucle una vez que se encuentre el índice
+                    }
+                }
+
+                // Si no se encuentra el índice, limpiar la selección en el ListView
+                lstIndices.getSelectionModel().clearSelection();
+
+            } catch (NumberFormatException e) {
+                logger.warning("Entrada inválida. Introduce un número válido.");
+            }
+        } else {
+            // Si el texto de filtro está vacío, limpiar la selección en el ListView
+            lstIndices.getSelectionModel().clearSelection();
+        }
+    }
+
+    /**
+     * Configura el deslizador de zoom.
+     * Este método configura un listener para el deslizador de zoom, que ajusta la escala del ImageView
+     * según el valor del deslizador.
+     */
+    private void setupSliderZoom() {
+        sldZoom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            double zoomValue = newValue.doubleValue();
+            // Aplica la escala al ImageView
+            imgIndice.setScaleX(zoomValue);
+            imgIndice.setScaleY(zoomValue);
+        });
     }
 
     /**
@@ -767,8 +815,7 @@ public class frmMain {
         // Crear un objeto File para el archivo donde se guardarán los datos de los gráficos
         File archivo = new File(configManager.getInitDir() + "Graficos.ind");
 
-        // Imprimir mensaje de inicio
-        System.out.println("Iniciando el guardado de índices desde memoria.");
+        logger.info("Iniciando el guardado de índices desde memoria.");
 
         try (RandomAccessFile file = new RandomAccessFile(archivo, "rw")) {
             // Posicionarse al inicio del archivo
@@ -802,10 +849,9 @@ public class frmMain {
                 }
             }
 
-            // Imprimir mensaje de éxito
-            System.out.println("¡Índices guardados!");
+            logger.info("Índices guardados!");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error al guardar los datos de gráficos", e);
             throw e; // Relanzar la excepción para manejarla fuera del método
         }
     }
@@ -833,8 +879,7 @@ public class frmMain {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                logger.error("Error al abrir la ventana de cabezas", e);
             }
         }
     }
@@ -859,8 +904,7 @@ public class frmMain {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                logger.error("Error al abrir la ventana de cascos", e);
             }
         }
     }
@@ -885,8 +929,7 @@ public class frmMain {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                logger.error("Error al abrir la ventana de cuerpos", e);
             }
         }
     }
@@ -911,8 +954,7 @@ public class frmMain {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                logger.error("Error al abrir la ventana de escudos", e);
             }
         }
     }
@@ -937,8 +979,7 @@ public class frmMain {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-
+                logger.error("Error al abrir la ventana de FXs", e);
             }
         }
     }
@@ -981,21 +1022,19 @@ public class frmMain {
 
 
                     } else {
-                        System.out.println("El indice seleccionado no es valido.");
-
+                        logger.warning("El indice seleccionado no es valido.");
                     }
 
                 } else {
-                    System.out.println("Indice invalido. Solo se aceptan indices desde el 1 hasta el " + dataManager.getGrhCount());
+                    logger.warning("Indice invalido. Solo se aceptan indices desde el 1 hasta el " + dataManager.getGrhCount());
                 }
 
             } catch (NumberFormatException e) {
-                System.out.println("Error: Entrada inválida. Introduce un número válido.");
-
+                logger.warning("Error: Entrada inválida. Introduce un número válido.");
             }
 
         } else {
-            System.out.println("Operación cancelada.");
+            logger.info("Operación cancelada.");
         }
 
     }
@@ -1050,11 +1089,11 @@ public class frmMain {
                     // Actualizamos el editor con el objeto grhData modificado
                     updateEditor(selectedGrh);
                 } else {
-                    System.out.println("No se ha seleccionado ningún grhData.");
+                    logger.warning("No se ha seleccionado ningún grhData.");
                 }
             }
         } else {
-            System.out.println("No se ha seleccionado ningún frame.");
+            logger.warning("No se ha seleccionado ningún frame.");
         }
     }
 
@@ -1084,7 +1123,7 @@ public class frmMain {
                     return;
                 }
 
-                 int grhLibres = buscarGrhLibres(numGrhLibres);
+                int grhLibres = buscarGrhLibres(numGrhLibres);
 
                 if (grhLibres == 0) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -1132,5 +1171,30 @@ public class frmMain {
 
         return 0;
 
+    }
+
+    /**
+     * Maneja el evento de clic en el menú "Adaptador de Grh".
+     * Abre una nueva ventana que permite adaptar gráficos.
+     */
+    @FXML
+    private void mnuGrhAdapter_OnAction() {
+        logger.info("Abriendo adaptador de Grh");
+        
+        // Crea la nueva ventana
+        Stage adaptadorStage = new Stage();
+        adaptadorStage.setTitle("Adaptador de Grh");
+
+        // Lee el archivo FXML para la ventana
+        try {
+            Parent adaptadorRoot = FXMLLoader.load(Main.class.getResource("frmAdaptador.fxml"));
+            adaptadorStage.setScene(new Scene(adaptadorRoot));
+            adaptadorStage.setResizable(false);
+            adaptadorStage.show();
+            
+            logger.info("Ventana de adaptador de Grh abierta exitosamente");
+        } catch (Exception e) {
+            logger.error("Error al abrir la ventana de adaptador de Grh", e);
+        }
     }
 }

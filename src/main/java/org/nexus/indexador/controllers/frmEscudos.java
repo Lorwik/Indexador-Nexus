@@ -21,6 +21,8 @@ import org.nexus.indexador.gamedata.models.GrhData;
 import org.nexus.indexador.gamedata.models.ShieldData;
 import org.nexus.indexador.utils.AnimationState;
 import org.nexus.indexador.utils.ConfigManager;
+import org.nexus.indexador.utils.ImageCache;
+import org.nexus.indexador.utils.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +64,8 @@ public class frmEscudos {
 
     private ConfigManager configManager;
     private DataManager dataManager;
+    private ImageCache imageCache;
+    private Logger logger;
 
     private Map<Integer, AnimationState> animationStates = new HashMap<>();
 
@@ -75,6 +79,10 @@ public class frmEscudos {
     protected void initialize() throws IOException {
         configManager = ConfigManager.getInstance();
         dataManager = DataManager.getInstance();
+        imageCache = ImageCache.getInstance();
+        logger = Logger.getInstance();
+        
+        logger.info("Inicializando controlador frmEscudos");
 
         shieldDataManager = new ShieldData(); // Crear una instancia de headData
 
@@ -85,35 +93,43 @@ public class frmEscudos {
 
         loadShieldData();
         setupHeadListListener();
+        
+        logger.info("Controlador frmEscudos inicializado correctamente");
     }
 
     /**
      * Carga los datos de los cuerpos desde un archivo y los muestra en la interfaz.
      */
     private void loadShieldData() {
-        // Llamar al método para leer el archivo binario y obtener la lista de headData
-        shieldList = dataManager.getShieldList();
-
-        // Inicializar el mapa de grhData
-        grhDataMap = new HashMap<>();
-
-        grhList = dataManager.getGrhList();
-
-        // Llenar el mapa con los datos de grhList
-        for (GrhData grh : grhList) {
-            grhDataMap.put(grh.getGrh(), grh);
+        try {
+            // Llamar al método para leer el archivo binario y obtener la lista de headData
+            shieldList = dataManager.readShieldFile();
+    
+            // Inicializar el mapa de grhData
+            grhDataMap = new HashMap<>();
+    
+            grhList = dataManager.getGrhList();
+    
+            // Llenar el mapa con los datos de grhList
+            for (GrhData grh : grhList) {
+                grhDataMap.put(grh.getGrh(), grh);
+            }
+    
+            // Actualizar el texto de los labels con la información obtenida
+            lblNEscudos.setText("Escudos cargados: " + dataManager.getNumShields());
+    
+            // Agregar los índices de gráficos al ListView
+            ObservableList<String> shieldIndices = FXCollections.observableArrayList();
+            for (int i = 1; i < shieldList.size() + 1; i++) {
+                shieldIndices.add(String.valueOf(i));
+            }
+    
+            lstShields.setItems(shieldIndices);
+            
+            logger.info("Datos de escudos cargados: " + shieldList.size() + " escudos");
+        } catch (IOException e) {
+            logger.error("Error al cargar datos de escudos", e);
         }
-
-        // Actualizar el texto de los labels con la información obtenida
-        lblNEscudos.setText("Escudos cargados: " + dataManager.getNumShields());
-
-        // Agregar los índices de gráficos al ListView
-        ObservableList<String> shieldIndices = FXCollections.observableArrayList();
-        for (int i = 1; i < shieldList.size() + 1; i++) {
-            shieldIndices.add(String.valueOf(i));
-        }
-
-        lstShields.setItems(shieldIndices);
 
     }
 
@@ -135,6 +151,8 @@ public class frmEscudos {
                 for (int i = 0; i <= 3; i++) {
                     drawShields(selectedShield, i);
                 }
+                
+                logger.debug("Escudo seleccionado: índice " + (selectedIndex + 1));
             }
         });
     }
@@ -192,6 +210,8 @@ public class frmEscudos {
         animationTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(100)));
         animationTimeline.setCycleCount(Animation.INDEFINITE);
         animationTimeline.play();
+        
+        logger.debug("Animación iniciada para dirección " + heading);
     }
 
     /**
@@ -214,45 +234,56 @@ public class frmEscudos {
 
             if (currentGrh != null) {
                 String imagePath = configManager.getGraphicsDir() + currentGrh.getFileNum() + ".png";
-                File imageFile = new File(imagePath);
-
-                // Verificar si el archivo de imagen existe
-                if (imageFile.exists()) {
-                    Image frameImage = new Image(imageFile.toURI().toString());
-                    PixelReader pixelReader = frameImage.getPixelReader();
-                    WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
-
-                    switch (heading) {
-                        case 0:
-                            imgSur.setImage(croppedImage);
-                            break;
-                        case 1:
-                            imgNorte.setImage(croppedImage);
-                            break;
-                        case 2:
-                            imgOeste.setImage(croppedImage);
-                            break;
-                        case 3:
-                            imgEste.setImage(croppedImage);
-                            break;
+                
+                // Obtener imagen desde el caché
+                Image frameImage = imageCache.getImage(imagePath);
+                
+                if (frameImage != null) {
+                    // Obtener la imagen recortada del caché
+                    WritableImage croppedImage = imageCache.getCroppedImage(
+                        imagePath, 
+                        currentGrh.getsX(), 
+                        currentGrh.getsY(), 
+                        currentGrh.getTileWidth(), 
+                        currentGrh.getTileHeight()
+                    );
+                    
+                    if (croppedImage != null) {
+                        switch (heading) {
+                            case 0:
+                                imgSur.setImage(croppedImage);
+                                break;
+                            case 1:
+                                imgNorte.setImage(croppedImage);
+                                break;
+                            case 2:
+                                imgOeste.setImage(croppedImage);
+                                break;
+                            case 3:
+                                imgEste.setImage(croppedImage);
+                                break;
+                        }
                     }
                 } else {
-                    System.out.println("updateFrame: El archivo de imagen no existe: " + imagePath);
+                    logger.warning("Error al cargar la imagen: " + imagePath);
                 }
             } else {
-                System.out.println("updateFrame: No se encontró el GrhData correspondiente para frameId: " + frames[currentFrameIndex]);
+                logger.warning("No se encontró el GrhData correspondiente para frameId: " + frameId);
             }
         } else {
-            System.out.println("updateFrame: El índice actual está fuera del rango adecuado: " + currentFrameIndex);
+            logger.warning("El índice actual está fuera del rango adecuado: " + currentFrameIndex);
         }
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
+        logger.info("Función de guardado aún no implementada");
     }
 
     public void btnAdd_OnAction(ActionEvent actionEvent) {
+        logger.info("Función de añadir aún no implementada");
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
+        logger.info("Función de eliminar aún no implementada");
     }
 }

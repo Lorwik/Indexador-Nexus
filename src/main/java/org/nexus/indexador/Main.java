@@ -7,14 +7,18 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.nexus.indexador.controllers.frmCargando;
+import org.nexus.indexador.utils.Logger;
 
 import java.io.IOException;
 
 public class Main extends Application {
 
+    private final Logger logger = Logger.getInstance();
+
     @Override
     public void start(Stage stage) {
-
+        logger.info("Iniciando aplicación Indexador Nexus");
+        
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("frmCargando.fxml"));
 
         try {
@@ -32,12 +36,19 @@ public class Main extends Application {
             stage.setScene(scene);
             stage.centerOnScreen();
             stage.show();
+            
+            logger.info("Pantalla de carga iniciada correctamente");
         } catch (IOException e) {
-            System.err.println("Error al cargar la interfaz de usuario: " + e.getMessage());
+            logger.error("Error al cargar la interfaz de usuario", e);
         }
     }
 
     public static void main(String[] args) {
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            Logger logger = Logger.getInstance();
+            logger.error("Excepción no capturada en el hilo: " + thread.getName(), throwable);
+        });
+        
         launch();
     }
 }
