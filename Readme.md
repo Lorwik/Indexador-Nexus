@@ -126,4 +126,4 @@ Si encuentras algún problema o tienes sugerencias, por favor [crea un issue](ht
 
 ## Licencia
 
-Este proyecto está licenciado bajo [MIT License](LICENSE).
+Este proyecto está licenciado bajo GPL-3.0 license.
