@@ -218,7 +218,7 @@ public class frmEscudos {
 
                 // Verificar si el archivo de imagen existe
                 if (imageFile.exists()) {
-                    Image frameImage = new Image(imagePath);
+                    Image frameImage = new Image(imageFile.toURI().toString());
                     PixelReader pixelReader = frameImage.getPixelReader();
                     WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());
 

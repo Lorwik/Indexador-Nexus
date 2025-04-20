@@ -212,7 +212,7 @@ public class frmFXs {
 
                 // Verificar si el archivo de imagen existe
                 if (imageFile.exists()) {
-                    Image frameImage = new Image(imageFile.toURI().toString());
+                    Image frameImage = new Image(imagePath);
 
                     PixelReader pixelReader = frameImage.getPixelReader();
                     WritableImage croppedImage = new WritableImage(pixelReader, currentGrh.getsX(), currentGrh.getsY(), currentGrh.getTileWidth(), currentGrh.getTileHeight());

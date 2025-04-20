@@ -398,6 +398,7 @@ public class frmMain {
                 if (imageFile.exists()) {
                     Image frameImage = new Image(imageFile.toURI().toString());
 
+
                     // Mandar a dibujar el gráfico completo en otro ImageView
                     drawFullImage(frameImage, selectedGrh);
 
